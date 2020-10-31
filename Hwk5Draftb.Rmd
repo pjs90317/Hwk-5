@@ -3,29 +3,28 @@ title: "Hwk 5"
 author: Patrick Sinclair, Kieran Yuen
 output: github_document
 ---
-  
-For this lab, we improve some of our regression models to explain wages.
 
-Work with a group to prepare a 4-min presentation by one of the group members about their experiment process and results. You get 45 min to prepare.
-
-Build on the previous lab in creating useful models.
-
-Concentrate on a smaller subset than previous. For instance if you wanted to look at wages for Hispanic women with at least a college degree, you might use
-
-```{r}
+```{r include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
 load("acs2017_ny_data.RData")
+library(stargazer)
+library(AER)
+library(car)
+```
+```{r}
 attach(acs2017_ny)
 healthcare <- (IND == "7970" | IND == "7980" | IND == "7990" | IND == "8070" | IND == "8080" | IND == "8090" | IND == "8170" | IND == "8180" | IND == "8190" | IND == "8270")
 use_varb <- (AGE >= 25) & (AGE <= 70) & (LABFORCE == 2) & (WKSWORK2 > 4) & (UHRSWORK >= 35) & (female == 1) & ((educ_college == 1) | (educ_advdeg == 1)) & healthcare
 dat_med <- subset(acs2017_ny, use_varb) 
 detach()
 ```
-```{r}
+```{r eval=FALSE}
 attach(dat_med)
 summary(dat_med)
 detach()
 ```
-```{r}
+For our subset, we decided to examine how different variables impact wages for people who identify as female working in the various aspects of the medical industry. We did this by creating an object that houses different industry codes pertaining to the medical field, including physician and dentist offices, hospitals, nursing facilities and other health-care practitioners.
+```{r eval=FALSE}
 # creating different objects for work departure time
 # want to create different objects within industry to subset office workers, hospitals, nursing facilities etc
 attach(dat_med)
@@ -45,20 +44,19 @@ table(deptime)
 sum(morning+daytime)
 detach()
 ```
-```{r}
+```{r echo=FALSE, eval=FALSE}
 attach(dat_med)
 summary(INCWAGE)
 ```
-Try a regression with age and age-squared in addition to your other controls, something like this:
+For our initial regression, we elected to use the [INCWAGE](https://cps.ipums.org/cps-action/variables/INCWAGE#description_section) observations as our measure of wage. We made this decision as we believe it is reasonable to assume that most of the data observations in our subset (females in the medical field with a Bachelor or Advanced degree) would only hold one job. INCWAGE is 'the total pre-tax and salary income' each of the respondent's earned as an employee in the previous 12 months prior to the survey.
 
-```{r}
+```{r echo = FALSE}
 attach(dat_med)
 lma <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college))
-lmdep <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college + deptime))
 # summary(lma)
-summary(lmdep)
+# lmdep <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college + deptime))
+# summary(lmdep)
 plot(lma)
-require(stargazer)
 suppressWarnings(stargazer(lma, type = "text"))
 ```
 ```{r}
@@ -170,3 +168,6 @@ lminterb
 and explain those outputs (different peaks for different groups).
 
 What are the other variables you are using in your regression? Do they have the expected signs and patterns of significance? Explain if there is a plausible causal link from X variables to Y and not the reverse. Explain your results, giving details about the estimation, some predicted values, and providing any relevant graphics. Impress.
+
+### Bibliography
+https://cps.ipums.org/cps-action/variables/INCWAGE#description_section
