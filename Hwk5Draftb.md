@@ -1,10 +1,6 @@
-Hwk 5
+Homework 5
 ================
 Patrick Sinclair, Kieran Yuen
-
-    ## The following object is masked from package:survival:
-    ## 
-    ##     veteran
 
 For our subset, we decided to examine how different variables impact
 wages for people who identify as female working in the various aspects
@@ -21,12 +17,6 @@ subset (females in the medical field with a Bachelor or Advanced degree)
 would only hold one job. INCWAGE is ‘the total pre-tax and salary
 income’ each of the respondent’s earned as an employee in the previous
 12 months prior to the survey.
-
-    ## The following object is masked from package:survival:
-    ## 
-    ##     veteran
-
-![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-6-3.png)<!-- -->![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-6-4.png)<!-- -->
 
     ## 
     ## ==========================================================
@@ -55,10 +45,28 @@ income’ each of the respondent’s earned as an employee in the previous
     ## ==========================================================
     ## Note:                          *p<0.1; **p<0.05; ***p<0.01
 
-![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+The regressor coefficients from the initial regression all appear to be
+statistically significant, the only exception being the intercept
+coefficient. What is curious is that holding a Bachelor’s degree has a
+*negative* correlation with wages within the subset, as does \(Age^2\).
+However, for our observations this makes sense; we limited our
+observations to people who hold Bachelor’s or Advanced degrees. From an
+outsider’s perspective of the industry, those whole hold advanced
+degrees or extra certifications within the medical field would be those
+who have specialized in particular fields, commanding higher wages for
+their specialized knowledge. A Bachelor’s degree is closer to an entry
+level requirement in the field, so the comparative wages are
+significantly lower.
 
-    ## [1] 84317.64
+From this regression, we created our prediction model using 50% of the
+2626 observations in our subset in order to give the model a sizable
+enough sample from which to draw its comparisons. For easy
+visualization, the jitter has been set to 0.1, to demonstrate the trends
+at different ages and the range of the INCWAGE axis has been capped at
+300,000.
 
+To draw some comparison from the linear regression, we set the
+prediction model to predict wages for those with advanced degrees.
 ![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
     ## [1] 119489.4
@@ -84,14 +92,10 @@ polynomials of age, such as \(Age^3\) or \(Age^4\)?
     ##     MIGRATE1, MIGRATE1D, MORTGAGE, NCHILD, NCHLT5, OCC, OWNCOST,
     ##     OWNERSHP, OWNERSHPD, POVERTY, PUMA, PWPUMA00, RACE, race_oth,
     ##     RACED, RELATE, RELATED, RENT, ROOMS, SCHOOL, SEX, SSMC, TRANTIME,
-    ##     TRANWORK, UHRSWORK, UNITSSTR, unmarried, veteran, VETSTAT,
-    ##     VETSTATD, white, WKSWORK2, YRSUSA1
+    ##     TRANWORK, UHRSWORK, UNITSSTR, unmarried, VETSTAT, VETSTATD, white,
+    ##     WKSWORK2, YRSUSA1
 
-    ## The following object is masked from package:survival:
-    ## 
-    ##     veteran
-
-![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-9-2.png)<!-- -->![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-9-3.png)<!-- -->![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-9-4.png)<!-- -->
+![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-10-2.png)<!-- -->![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-10-3.png)<!-- -->![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-10-4.png)<!-- -->
 
     ## 
     ## ========================================================================================
@@ -129,7 +133,7 @@ polynomials of age, such as \(Age^3\) or \(Age^4\)?
     ## ========================================================================================
     ## Note:                                                        *p<0.1; **p<0.05; ***p<0.01
 
-![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
     ## [1] 85445.97
 
@@ -166,7 +170,7 @@ a function of age.
 What if you used \(log(Age)\)? (And why would polynomials in
 \(log(Age)\) be useless? Experiment.)
 
-![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
     ## [1] 85445.97
 
@@ -199,53 +203,53 @@ Why don’t we use polynomial terms of dummy variables? Experiment.
 What is the predicted wage, from your model, for a few relevant cases?
 Do those seem reasonable?
 
-    ##    AGE female educ_college educ_advdeg     yhat yhatploys  yhatlog
-    ## 1   25      1            1           1 41671.93  38250.94 38951.67
-    ## 2   26      1            1           1 44434.74  42335.88 42671.68
-    ## 3   27      1            1           1 47105.05  46110.97 46135.20
-    ## 4   28      1            1           1 49682.85  49586.86 49360.89
-    ## 5   29      1            1           1 52168.15  52775.74 52365.44
-    ## 6   30      1            1           1 54560.95  55691.13 55163.84
-    ## 7   31      1            1           1 56861.25  58347.69 57769.63
-    ## 8   32      1            1           1 59069.04  60761.07 60195.04
-    ## 9   33      1            1           1 61184.34  62947.66 62451.16
-    ## 10  34      1            1           1 63207.12  64924.46 64548.10
-    ## 11  35      1            1           1 65137.41  66708.85 66495.10
-    ## 12  36      1            1           1 66975.20  68318.42 68300.61
-    ## 13  37      1            1           1 68720.48  69770.80 69972.37
-    ## 14  38      1            1           1 70373.26  71083.42 71517.53
-    ## 15  39      1            1           1 71933.53  72273.36 72942.66
-    ## 16  40      1            1           1 73401.31  73357.18 74253.84
-    ## 17  41      1            1           1 74776.58  74350.67 75456.70
-    ## 18  42      1            1           1 76059.35  75268.72 76556.46
-    ## 19  43      1            1           1 77249.62  76125.09 77557.96
-    ## 20  44      1            1           1 78347.38  76932.26 78465.74
-    ## 21  45      1            1           1 79352.65  77701.22 79284.00
-    ## 22  46      1            1           1 80265.41  78441.26 80016.68
-    ## 23  47      1            1           1 81085.66  79159.82 80667.46
-    ## 24  48      1            1           1 81813.42  79862.30 81239.78
-    ## 25  49      1            1           1 82448.67  80551.83 81736.89
-    ## 26  50      1            1           1 82991.42  81229.13 82161.82
-    ## 27  51      1            1           1 83441.67  81892.28 82517.44
-    ## 28  52      1            1           1 83799.42  82536.58 82806.42
-    ## 29  53      1            1           1 84064.66  83154.32 83031.32
-    ## 30  54      1            1           1 84237.40  83734.59 83194.53
-    ## 31  55      1            1           1 84317.64  84263.13 83298.31
-    ## 32  56      1            1           1 84305.38  84722.11 83344.81
-    ## 33  57      1            1           1 84200.61  85089.94 83336.04
-    ## 34  58      1            1           1 84003.34  85341.11 83273.95
-    ## 35  59      1            1           1 83713.57  85445.97 83160.33
-    ## 36  60      1            1           1 83331.30  85370.56 82996.94
-    ## 37  61      1            1           1 82856.52  85076.41 82785.42
-    ## 38  62      1            1           1 82289.24  84520.36 82527.32
-    ## 39  63      1            1           1 81629.46  83654.38 82224.15
-    ## 40  64      1            1           1 80877.18  82425.34 81877.31
-    ## 41  65      1            1           1 80032.39  80774.90 81488.17
-    ## 42  66      1            1           1 79095.10  78639.22 81058.02
-    ## 43  67      1            1           1 78065.31  75948.86 80588.09
-    ## 44  68      1            1           1 76943.02  72628.55 80079.56
-    ## 45  69      1            1           1 75728.22  68597.01 79533.55
-    ## 46  70      1            1           1 74420.93  63766.75 78951.15
+    ##    AGE female educ_college educ_advdeg yhatploys  yhatlog
+    ## 1   25      1            1           1  38250.94 38951.67
+    ## 2   26      1            1           1  42335.88 42671.68
+    ## 3   27      1            1           1  46110.97 46135.20
+    ## 4   28      1            1           1  49586.86 49360.89
+    ## 5   29      1            1           1  52775.74 52365.44
+    ## 6   30      1            1           1  55691.13 55163.84
+    ## 7   31      1            1           1  58347.69 57769.63
+    ## 8   32      1            1           1  60761.07 60195.04
+    ## 9   33      1            1           1  62947.66 62451.16
+    ## 10  34      1            1           1  64924.46 64548.10
+    ## 11  35      1            1           1  66708.85 66495.10
+    ## 12  36      1            1           1  68318.42 68300.61
+    ## 13  37      1            1           1  69770.80 69972.37
+    ## 14  38      1            1           1  71083.42 71517.53
+    ## 15  39      1            1           1  72273.36 72942.66
+    ## 16  40      1            1           1  73357.18 74253.84
+    ## 17  41      1            1           1  74350.67 75456.70
+    ## 18  42      1            1           1  75268.72 76556.46
+    ## 19  43      1            1           1  76125.09 77557.96
+    ## 20  44      1            1           1  76932.26 78465.74
+    ## 21  45      1            1           1  77701.22 79284.00
+    ## 22  46      1            1           1  78441.26 80016.68
+    ## 23  47      1            1           1  79159.82 80667.46
+    ## 24  48      1            1           1  79862.30 81239.78
+    ## 25  49      1            1           1  80551.83 81736.89
+    ## 26  50      1            1           1  81229.13 82161.82
+    ## 27  51      1            1           1  81892.28 82517.44
+    ## 28  52      1            1           1  82536.58 82806.42
+    ## 29  53      1            1           1  83154.32 83031.32
+    ## 30  54      1            1           1  83734.59 83194.53
+    ## 31  55      1            1           1  84263.13 83298.31
+    ## 32  56      1            1           1  84722.11 83344.81
+    ## 33  57      1            1           1  85089.94 83336.04
+    ## 34  58      1            1           1  85341.11 83273.95
+    ## 35  59      1            1           1  85445.97 83160.33
+    ## 36  60      1            1           1  85370.56 82996.94
+    ## 37  61      1            1           1  85076.41 82785.42
+    ## 38  62      1            1           1  84520.36 82527.32
+    ## 39  63      1            1           1  83654.38 82224.15
+    ## 40  64      1            1           1  82425.34 81877.31
+    ## 41  65      1            1           1  80774.90 81488.17
+    ## 42  66      1            1           1  78639.22 81058.02
+    ## 43  67      1            1           1  75948.86 80588.09
+    ## 44  68      1            1           1  72628.55 80079.56
+    ## 45  69      1            1           1  68597.01 79533.55
+    ## 46  70      1            1           1  63766.75 78951.15
 
     ##    AGE female educ_college educ_advdeg      yhat
     ## 1   25      1            0           1  76843.65
@@ -348,55 +352,58 @@ variable? Compare the pattern of predicted values from the two models
 (remember to take exp() of the predicted value, where the dependent is
 log wage). Discuss.
 
-    ##    AGE female educ_college educ_advdeg     yhat yhatploys  yhatlog
-    ## 1   25      1            1           1 41671.93  38250.94 38951.67
-    ## 2   26      1            1           1 44434.74  42335.88 42671.68
-    ## 3   27      1            1           1 47105.05  46110.97 46135.20
-    ## 4   28      1            1           1 49682.85  49586.86 49360.89
-    ## 5   29      1            1           1 52168.15  52775.74 52365.44
-    ## 6   30      1            1           1 54560.95  55691.13 55163.84
-    ## 7   31      1            1           1 56861.25  58347.69 57769.63
-    ## 8   32      1            1           1 59069.04  60761.07 60195.04
-    ## 9   33      1            1           1 61184.34  62947.66 62451.16
-    ## 10  34      1            1           1 63207.12  64924.46 64548.10
-    ## 11  35      1            1           1 65137.41  66708.85 66495.10
-    ## 12  36      1            1           1 66975.20  68318.42 68300.61
-    ## 13  37      1            1           1 68720.48  69770.80 69972.37
-    ## 14  38      1            1           1 70373.26  71083.42 71517.53
-    ## 15  39      1            1           1 71933.53  72273.36 72942.66
-    ## 16  40      1            1           1 73401.31  73357.18 74253.84
-    ## 17  41      1            1           1 74776.58  74350.67 75456.70
-    ## 18  42      1            1           1 76059.35  75268.72 76556.46
-    ## 19  43      1            1           1 77249.62  76125.09 77557.96
-    ## 20  44      1            1           1 78347.38  76932.26 78465.74
-    ## 21  45      1            1           1 79352.65  77701.22 79284.00
-    ## 22  46      1            1           1 80265.41  78441.26 80016.68
-    ## 23  47      1            1           1 81085.66  79159.82 80667.46
-    ## 24  48      1            1           1 81813.42  79862.30 81239.78
-    ## 25  49      1            1           1 82448.67  80551.83 81736.89
-    ## 26  50      1            1           1 82991.42  81229.13 82161.82
-    ## 27  51      1            1           1 83441.67  81892.28 82517.44
-    ## 28  52      1            1           1 83799.42  82536.58 82806.42
-    ## 29  53      1            1           1 84064.66  83154.32 83031.32
-    ## 30  54      1            1           1 84237.40  83734.59 83194.53
-    ## 31  55      1            1           1 84317.64  84263.13 83298.31
-    ## 32  56      1            1           1 84305.38  84722.11 83344.81
-    ## 33  57      1            1           1 84200.61  85089.94 83336.04
-    ## 34  58      1            1           1 84003.34  85341.11 83273.95
-    ## 35  59      1            1           1 83713.57  85445.97 83160.33
-    ## 36  60      1            1           1 83331.30  85370.56 82996.94
-    ## 37  61      1            1           1 82856.52  85076.41 82785.42
-    ## 38  62      1            1           1 82289.24  84520.36 82527.32
-    ## 39  63      1            1           1 81629.46  83654.38 82224.15
-    ## 40  64      1            1           1 80877.18  82425.34 81877.31
-    ## 41  65      1            1           1 80032.39  80774.90 81488.17
-    ## 42  66      1            1           1 79095.10  78639.22 81058.02
-    ## 43  67      1            1           1 78065.31  75948.86 80588.09
-    ## 44  68      1            1           1 76943.02  72628.55 80079.56
-    ## 45  69      1            1           1 75728.22  68597.01 79533.55
-    ## 46  70      1            1           1 74420.93  63766.75 78951.15
+    ##    AGE female educ_college educ_advdeg yhatploys  yhatlog
+    ## 1   25      1            1           1  38250.94 38951.67
+    ## 2   26      1            1           1  42335.88 42671.68
+    ## 3   27      1            1           1  46110.97 46135.20
+    ## 4   28      1            1           1  49586.86 49360.89
+    ## 5   29      1            1           1  52775.74 52365.44
+    ## 6   30      1            1           1  55691.13 55163.84
+    ## 7   31      1            1           1  58347.69 57769.63
+    ## 8   32      1            1           1  60761.07 60195.04
+    ## 9   33      1            1           1  62947.66 62451.16
+    ## 10  34      1            1           1  64924.46 64548.10
+    ## 11  35      1            1           1  66708.85 66495.10
+    ## 12  36      1            1           1  68318.42 68300.61
+    ## 13  37      1            1           1  69770.80 69972.37
+    ## 14  38      1            1           1  71083.42 71517.53
+    ## 15  39      1            1           1  72273.36 72942.66
+    ## 16  40      1            1           1  73357.18 74253.84
+    ## 17  41      1            1           1  74350.67 75456.70
+    ## 18  42      1            1           1  75268.72 76556.46
+    ## 19  43      1            1           1  76125.09 77557.96
+    ## 20  44      1            1           1  76932.26 78465.74
+    ## 21  45      1            1           1  77701.22 79284.00
+    ## 22  46      1            1           1  78441.26 80016.68
+    ## 23  47      1            1           1  79159.82 80667.46
+    ## 24  48      1            1           1  79862.30 81239.78
+    ## 25  49      1            1           1  80551.83 81736.89
+    ## 26  50      1            1           1  81229.13 82161.82
+    ## 27  51      1            1           1  81892.28 82517.44
+    ## 28  52      1            1           1  82536.58 82806.42
+    ## 29  53      1            1           1  83154.32 83031.32
+    ## 30  54      1            1           1  83734.59 83194.53
+    ## 31  55      1            1           1  84263.13 83298.31
+    ## 32  56      1            1           1  84722.11 83344.81
+    ## 33  57      1            1           1  85089.94 83336.04
+    ## 34  58      1            1           1  85341.11 83273.95
+    ## 35  59      1            1           1  85445.97 83160.33
+    ## 36  60      1            1           1  85370.56 82996.94
+    ## 37  61      1            1           1  85076.41 82785.42
+    ## 38  62      1            1           1  84520.36 82527.32
+    ## 39  63      1            1           1  83654.38 82224.15
+    ## 40  64      1            1           1  82425.34 81877.31
+    ## 41  65      1            1           1  80774.90 81488.17
+    ## 42  66      1            1           1  78639.22 81058.02
+    ## 43  67      1            1           1  75948.86 80588.09
+    ## 44  68      1            1           1  72628.55 80079.56
+    ## 45  69      1            1           1  68597.01 79533.55
+    ## 46  70      1            1           1  63766.75 78951.15
 
-    ## [1] 73309.33
+    ## Warning in mean.default(medpredict$yhat): argument is not numeric or logical:
+    ## returning NA
+
+    ## [1] NA
 
     ## [1] 73658.94
 

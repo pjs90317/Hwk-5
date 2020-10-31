@@ -1,24 +1,27 @@
 ---
-title: "Hwk 5"
+title: "Homework 5"
 author: Patrick Sinclair, Kieran Yuen
 output: github_document
 ---
 
 ```{r include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
-load("acs2017_ny_data.RData")
 library(stargazer)
-library(AER)
-library(car)
+load("acs2017_ny_data.RData")
 ```
 ```{r}
 attach(acs2017_ny)
 healthcare <- (IND == "7970" | IND == "7980" | IND == "7990" | IND == "8070" | IND == "8080" | IND == "8090" | IND == "8170" | IND == "8180" | IND == "8190" | IND == "8270")
 use_varb <- (AGE >= 25) & (AGE <= 70) & (LABFORCE == 2) & (WKSWORK2 > 4) & (UHRSWORK >= 35) & (female == 1) & ((educ_college == 1) | (educ_advdeg == 1)) & healthcare
-dat_med <- subset(acs2017_ny, use_varb) 
+dat_meda <- subset(acs2017_ny, use_varb)
+dat_med <- subset(dat_meda, select = -(veteran))
 detach()
 ```
+```{r include=FALSE}
+library(AER)
+```
 ```{r eval=FALSE}
+
 attach(dat_med)
 summary(dat_med)
 detach()
@@ -47,37 +50,47 @@ detach()
 ```{r echo=FALSE, eval=FALSE}
 attach(dat_med)
 summary(INCWAGE)
+detach()
 ```
 For our initial regression, we elected to use the [INCWAGE](https://cps.ipums.org/cps-action/variables/INCWAGE#description_section) observations as our measure of wage. We made this decision as we believe it is reasonable to assume that most of the data observations in our subset (females in the medical field with a Bachelor or Advanced degree) would only hold one job. INCWAGE is 'the total pre-tax and salary income' each of the respondent's earned as an employee in the previous 12 months prior to the survey.
 
 ```{r echo = FALSE}
-attach(dat_med)
-lma <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college))
+lma <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college), data = dat_med)
 # summary(lma)
 # lmdep <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college + deptime))
 # summary(lmdep)
-plot(lma)
 suppressWarnings(stargazer(lma, type = "text"))
+# par(mfrow = c(2, 2))
+# plot(lma)
+detach()
 ```
+The regressor coefficients from the initial regression all appear to be statistically significant, the only exception being the intercept coefficient. What is curious is that holding a Bachelor's degree has a *negative* correlation with wages within the subset, as does $Age^2$. However, for our observations this makes sense; we limited our observations to people who hold Bachelor's or Advanced degrees. From an outsider's perspective of the industry, those whole hold advanced degrees or extra certifications within the medical field would be those who have specialized in particular fields, commanding higher wages for their specialized knowledge. A Bachelor's degree is closer to an entry level requirement in the field, so the comparative wages are significantly lower.
+
+From this regression, we created our prediction model using 50% of the 2626 observations in our subset in order to give the model a sizable enough sample from which to draw its comparisons. For easy visualization, the jitter has been set to 0.1, to demonstrate the trends at different ages and the range of the INCWAGE axis has been capped at 300,000.
+
+To draw some comparison from the linear regression, we set the prediction model to predict wages for those with advanced degrees.
 ```{r}
+attach(dat_med)
 NNobs <- length(INCWAGE)
 set.seed(12345)
 graph_obs <- (runif(NNobs) < 0.5)
 med_graph <-subset(dat_med, graph_obs) 
-plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,300000), data = med_graph)
-require(AER)
+plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
 medpredict <- data.frame(AGE = 25:70, female = 1, educ_college = 1, educ_advdeg = 1)
-medpredict$yhat <- predict(lma, newdata = medpredict)
-lines(yhat ~ AGE, data = medpredict)
-max(medpredict$yhat) # peak predicted wage
-```
-```{r}
-plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,300000), data = med_graph)
-require(AER)
+#medpredict$yhat <- predict(lma, newdata = medpredict)
+#lines(yhat ~ AGE, data = medpredict)
+#max(medpredict$yhat) # peak predicted wage
 medpredictb <- data.frame(AGE = 25:70, female = 1, educ_college = 0, educ_advdeg = 1)
 medpredictb$yhat <- predict(lma, newdata = medpredictb)
-lines(yhat ~ AGE, data = medpredictb, col = "blue")
+lines(yhat ~ AGE, data = medpredictb)
 max(medpredictb$yhat) # peak predicted wage
+```
+```{r eval=FALSE}
+# plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,300000), data = med_graph)
+# medpredictb <- data.frame(AGE = 25:70, female = 1, educ_college = 0, educ_advdeg = 1)
+# medpredictb$yhat <- predict(lma, newdata = medpredictb)
+# lines(yhat ~ AGE, data = medpredictb, col = "blue")
+# max(medpredictb$yhat) # peak predicted wage
 ```
 What is the peak of predicted wage? What if you add higher order polynomials of age, such as $Age^3$ or $Age^4$? 
 ```{r}
