@@ -1,13 +1,8 @@
 ---
-title: "Lab 5"
-font-family: 'Corbel'
+title: "Hwk 5"
+author: Patrick Sinclair, Kieran Yuen
 output: github_document
 ---
-  
-
-<p style="color:rgb(182,18,27);font-family:corbel">Econ B2000, MA Econometrics</p>
-<p style="color:rgb(182,18,27);font-family:corbel">Kevin R Foster, the Colin Powell School at the City College of New York, CUNY</p>
-<p style="color:rgb(182,18,27);font-family:corbel">Fall 2020</p>
   
 For this lab, we improve some of our regression models to explain wages.
 
@@ -17,19 +12,18 @@ Build on the previous lab in creating useful models.
 
 Concentrate on a smaller subset than previous. For instance if you wanted to look at wages for Hispanic women with at least a college degree, you might use
 
-```{r eval = FALSE}
-setwd("~/CCNY/Econometrics/Homework/Draft Hwk Files")
+```{r}
 load("acs2017_ny_data.RData")
 attach(acs2017_ny)
 healthcare <- (IND == "7970" | IND == "7980" | IND == "7990" | IND == "8070" | IND == "8080" | IND == "8090" | IND == "8170" | IND == "8180" | IND == "8190" | IND == "8270")
 use_varb <- (AGE >= 25) & (AGE <= 70) & (LABFORCE == 2) & (WKSWORK2 > 4) & (UHRSWORK >= 35) & (female == 1) & ((educ_college == 1) | (educ_advdeg == 1)) & healthcare
-dat_med <- subset(acs2017_ny, use_varb) # 
+dat_med <- subset(acs2017_ny, use_varb) 
 detach()
 ```
 ```{r}
 attach(dat_med)
 summary(dat_med)
-detach(dat_med)
+detach()
 ```
 ```{r}
 # creating different objects for work departure time
@@ -52,6 +46,7 @@ sum(morning+daytime)
 detach()
 ```
 ```{r}
+attach(dat_med)
 summary(INCWAGE)
 ```
 Try a regression with age and age-squared in addition to your other controls, something like this:
@@ -133,6 +128,7 @@ Recall about how dummy variables work. If you added educ_hs in a regression usin
 
 ```{r}
 # Adding educ_hs in our particular subset will render it as omitted (we haven't included it as a variable in the subset). If we add the educ_advdeg variable, it will also be rendered as omitted, so R can run a comparison.
+lmedu <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college + educ_advdeg))
 lmedu
 lmedua <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_advdeg + educ_college))
 lmedua
