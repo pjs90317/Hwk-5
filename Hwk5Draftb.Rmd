@@ -76,13 +76,18 @@ set.seed(12345)
 graph_obs <- (runif(NNobs) < 0.5)
 med_graph <-subset(dat_med, graph_obs)
 ```
-```{r}
-png(filename="~/CCNY/Econometrics/Homework/Draft Hwk Files/Homework-5/Hwk-5/initlmplot.png")
+```{r include = FALSE}
+png(filename="initlmplot.png")
 plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
 medpredict <- data.frame(AGE = 25:70, female = 1, educ_college = 1, educ_advdeg = 1)
+medpredictb <- data.frame(AGE = 25:70, female = 1, educ_college = 0, educ_advdeg = 1)
+medpredictb$yhat <- predict(lma, newdata = medpredictb)
+lines(yhat ~ AGE, data = medpredictb)
 dev.off()
 ```
-```{r}
+
+![initial regression plot](./initlmplot.png)
+```{r eval = FALSE}
 plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
 medpredict <- data.frame(AGE = 25:70, female = 1, educ_college = 1, educ_advdeg = 1)
 # medpredict$yhat <- predict(lma, newdata = medpredict)
@@ -112,7 +117,7 @@ lmpolys <- lm((INCWAGE ~ AGE + I(AGE^2) + I(AGE^3) + I(AGE^4) + I(AGE^5) + educ_
 # plot(lmpolys)
 suppressWarnings(stargazer(lmpolys, type = "text"))
 ```
-```{r}
+```{r include=FALSE}
 # plots line on plot - peak wages AREN'T particularly different from those of the Aged^2 lm
 png(filename="~/CCNY/Econometrics/Homework/Draft Hwk Files/Homework-5/Hwk-5/polyplot.png")
 plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
@@ -122,7 +127,9 @@ lines(yhat ~ AGE, data = medpredictb, lty = 2)
 legend("topleft", c("Polynomials", "Squared"), col = c("Purple", "Black"), lty = c(1,2), bty = "n")
 dev.off()
 ```
-```{r}
+![Polynomial Regression](./polyplot.png)
+
+```{r eval=FALSE}
 plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
 medpredictb$yhatpolys <- predict(lmpolys, newdata = medpredictb)
 lines(yhatpolys ~ AGE, data = medpredictb, col = "Purple" )
@@ -181,9 +188,9 @@ What is the predicted wage, from your model, for a few relevant cases? Do those 
 # we can also change the medpredict objects to use the poly regression or the log regression
 medpredictc <- data.frame(AGE = 25:70, female = 1, educ_college = 1, educ_advdeg = 0)
 medpredictc$yhat <- predict(lma, newdata = medpredictc)
-medpredict
+# medpredict
 medpredictb
-medpredictc
+# medpredictc
 ```
 
 What is difference in regression from using log wage as the dependent variable? Compare the pattern of predicted values from the two models (remember to take exp() of the predicted value, where the dependent is log wage). Discuss.

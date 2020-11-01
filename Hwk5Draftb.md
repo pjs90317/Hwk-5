@@ -68,12 +68,10 @@ at different ages and the range of the INCWAGE axis has been capped at
 To draw some comparison from the linear regression, we set the
 prediction model to predict wages for those with advanced degrees.
 
-    ## png 
-    ##   2
+![initial regression plot](./initlmplot.png)
 
-![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-10-1.png)<!-- --> The plot
-for the predicted values shows us a gently sloped concave curve that has
-a peak predicted value of
+The plot for the predicted values shows us a gently sloped concave curve
+that has a peak predicted value of
 
     ## [1] 119489.4
 
@@ -117,12 +115,10 @@ get progressively smaller.
     ## ========================================================================================
     ## Note:                                                        *p<0.1; **p<0.05; ***p<0.01
 
-    ## png 
-    ##   2
+![Polynomial Regression](./polyplot.png)
 
-![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-14-1.png)<!-- --> When
-plotted, the curves follow a similar slope and shape. Adding the extra
-polynomials increases the maximum predicted wage slightly to
+When plotted, the curves follow a similar slope and shape. Adding the
+extra polynomials increases the maximum predicted wage slightly to
 
     ## [1] 120590.2
 
@@ -195,54 +191,6 @@ Why don’t we use polynomial terms of dummy variables? Experiment.
 What is the predicted wage, from your model, for a few relevant cases?
 Do those seem reasonable?
 
-    ##    AGE female educ_college educ_advdeg  yhatlog
-    ## 1   25      1            1           1 38951.67
-    ## 2   26      1            1           1 42671.68
-    ## 3   27      1            1           1 46135.20
-    ## 4   28      1            1           1 49360.89
-    ## 5   29      1            1           1 52365.44
-    ## 6   30      1            1           1 55163.84
-    ## 7   31      1            1           1 57769.63
-    ## 8   32      1            1           1 60195.04
-    ## 9   33      1            1           1 62451.16
-    ## 10  34      1            1           1 64548.10
-    ## 11  35      1            1           1 66495.10
-    ## 12  36      1            1           1 68300.61
-    ## 13  37      1            1           1 69972.37
-    ## 14  38      1            1           1 71517.53
-    ## 15  39      1            1           1 72942.66
-    ## 16  40      1            1           1 74253.84
-    ## 17  41      1            1           1 75456.70
-    ## 18  42      1            1           1 76556.46
-    ## 19  43      1            1           1 77557.96
-    ## 20  44      1            1           1 78465.74
-    ## 21  45      1            1           1 79284.00
-    ## 22  46      1            1           1 80016.68
-    ## 23  47      1            1           1 80667.46
-    ## 24  48      1            1           1 81239.78
-    ## 25  49      1            1           1 81736.89
-    ## 26  50      1            1           1 82161.82
-    ## 27  51      1            1           1 82517.44
-    ## 28  52      1            1           1 82806.42
-    ## 29  53      1            1           1 83031.32
-    ## 30  54      1            1           1 83194.53
-    ## 31  55      1            1           1 83298.31
-    ## 32  56      1            1           1 83344.81
-    ## 33  57      1            1           1 83336.04
-    ## 34  58      1            1           1 83273.95
-    ## 35  59      1            1           1 83160.33
-    ## 36  60      1            1           1 82996.94
-    ## 37  61      1            1           1 82785.42
-    ## 38  62      1            1           1 82527.32
-    ## 39  63      1            1           1 82224.15
-    ## 40  64      1            1           1 81877.31
-    ## 41  65      1            1           1 81488.17
-    ## 42  66      1            1           1 81058.02
-    ## 43  67      1            1           1 80588.09
-    ## 44  68      1            1           1 80079.56
-    ## 45  69      1            1           1 79533.55
-    ## 46  70      1            1           1 78951.15
-
     ##    AGE female educ_college educ_advdeg      yhat yhatpolys
     ## 1   25      1            0           1  76843.65  73395.18
     ## 2   26      1            0           1  79606.46  77480.12
@@ -290,54 +238,6 @@ Do those seem reasonable?
     ## 44  68      1            0           1 112114.74 107772.79
     ## 45  69      1            0           1 110899.94 103741.25
     ## 46  70      1            0           1 109592.64  98910.99
-
-    ##    AGE female educ_college educ_advdeg     yhat
-    ## 1   25      1            1           0 41671.93
-    ## 2   26      1            1           0 44434.74
-    ## 3   27      1            1           0 47105.05
-    ## 4   28      1            1           0 49682.85
-    ## 5   29      1            1           0 52168.15
-    ## 6   30      1            1           0 54560.95
-    ## 7   31      1            1           0 56861.25
-    ## 8   32      1            1           0 59069.04
-    ## 9   33      1            1           0 61184.34
-    ## 10  34      1            1           0 63207.12
-    ## 11  35      1            1           0 65137.41
-    ## 12  36      1            1           0 66975.20
-    ## 13  37      1            1           0 68720.48
-    ## 14  38      1            1           0 70373.26
-    ## 15  39      1            1           0 71933.53
-    ## 16  40      1            1           0 73401.31
-    ## 17  41      1            1           0 74776.58
-    ## 18  42      1            1           0 76059.35
-    ## 19  43      1            1           0 77249.62
-    ## 20  44      1            1           0 78347.38
-    ## 21  45      1            1           0 79352.65
-    ## 22  46      1            1           0 80265.41
-    ## 23  47      1            1           0 81085.66
-    ## 24  48      1            1           0 81813.42
-    ## 25  49      1            1           0 82448.67
-    ## 26  50      1            1           0 82991.42
-    ## 27  51      1            1           0 83441.67
-    ## 28  52      1            1           0 83799.42
-    ## 29  53      1            1           0 84064.66
-    ## 30  54      1            1           0 84237.40
-    ## 31  55      1            1           0 84317.64
-    ## 32  56      1            1           0 84305.38
-    ## 33  57      1            1           0 84200.61
-    ## 34  58      1            1           0 84003.34
-    ## 35  59      1            1           0 83713.57
-    ## 36  60      1            1           0 83331.30
-    ## 37  61      1            1           0 82856.52
-    ## 38  62      1            1           0 82289.24
-    ## 39  63      1            1           0 81629.46
-    ## 40  64      1            1           0 80877.18
-    ## 41  65      1            1           0 80032.39
-    ## 42  66      1            1           0 79095.10
-    ## 43  67      1            1           0 78065.31
-    ## 44  68      1            1           0 76943.02
-    ## 45  69      1            1           0 75728.22
-    ## 46  70      1            1           0 74420.93
 
 What is difference in regression from using log wage as the dependent
 variable? Compare the pattern of predicted values from the two models
