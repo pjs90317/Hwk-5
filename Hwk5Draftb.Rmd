@@ -21,7 +21,6 @@ detach()
 library(AER)
 ```
 ```{r eval=FALSE}
-
 attach(dat_med)
 summary(dat_med)
 detach()
@@ -55,7 +54,8 @@ detach()
 For our initial regression, we elected to use the [INCWAGE](https://cps.ipums.org/cps-action/variables/INCWAGE#description_section) observations as our measure of wage. We made this decision as we believe it is reasonable to assume that most of the data observations in our subset (females in the medical field with a Bachelor or Advanced degree) would only hold one job. INCWAGE is 'the total pre-tax and salary income' each of the respondent's earned as an employee in the previous 12 months prior to the survey.
 
 ```{r echo = FALSE}
-lma <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college), data = dat_med)
+attach(dat_med)
+lma <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college))
 # summary(lma)
 # lmdep <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college + deptime))
 # summary(lmdep)
@@ -68,7 +68,7 @@ The regressor coefficients from the initial regression all appear to be statisti
 
 From this regression, we created our prediction model using 50% of the 2626 observations in our subset in order to give the model a sizable enough sample from which to draw its comparisons. For easy visualization, the jitter has been set to 0.1, to demonstrate the trends at different ages and the range of the INCWAGE axis has been capped at 300,000.
 
-To draw some comparison from the linear regression, we set the prediction model to predict wages for those with advanced degrees.
+To draw some comparison from the linear regression, we set the prediction model to predict wages for those with advanced degrees.  
 ```{r}
 attach(dat_med)
 NNobs <- length(INCWAGE)
@@ -77,38 +77,46 @@ graph_obs <- (runif(NNobs) < 0.5)
 med_graph <-subset(dat_med, graph_obs) 
 plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
 medpredict <- data.frame(AGE = 25:70, female = 1, educ_college = 1, educ_advdeg = 1)
-#medpredict$yhat <- predict(lma, newdata = medpredict)
-#lines(yhat ~ AGE, data = medpredict)
-#max(medpredict$yhat) # peak predicted wage
+# medpredict$yhat <- predict(lma, newdata = medpredict)
+# lines(yhat ~ AGE, data = medpredict)
+# max(medpredict$yhat) # peak predicted wage
 medpredictb <- data.frame(AGE = 25:70, female = 1, educ_college = 0, educ_advdeg = 1)
 medpredictb$yhat <- predict(lma, newdata = medpredictb)
 lines(yhat ~ AGE, data = medpredictb)
-max(medpredictb$yhat) # peak predicted wage
-```
-```{r eval=FALSE}
 # plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,300000), data = med_graph)
 # medpredictb <- data.frame(AGE = 25:70, female = 1, educ_college = 0, educ_advdeg = 1)
 # medpredictb$yhat <- predict(lma, newdata = medpredictb)
 # lines(yhat ~ AGE, data = medpredictb, col = "blue")
 # max(medpredictb$yhat) # peak predicted wage
+detach()
 ```
-What is the peak of predicted wage? What if you add higher order polynomials of age, such as $Age^3$ or $Age^4$? 
+The plot for the predicted values shows us a gently sloped concave curve that has a peak predicted value of
+```{r}
+max(medpredictb$yhat)
+detach()
+```
+When we added high polynomials, $Age^3$, $Age^4$ and $Age^5$, to the regression, the absolute values of the corresponding coefficients get progressively smaller.
 ```{r}
 # sets up lm with polynomials included
 attach(dat_med)
 lmpolys <- lm((INCWAGE ~ AGE + I(AGE^2) + I(AGE^3) + I(AGE^4) + I(AGE^5) + educ_college))
 # summary(lma)
-plot(lmpolys)
-require(stargazer)
+# plot(lmpolys)
 suppressWarnings(stargazer(lmpolys, type = "text"))
 ```
 ```{r}
 # plots line on plot - peak wages AREN'T particularly different from those of the Aged^2 lm
-plot(INCWAGE ~ jitter(AGE, factor = 1), pch = 16, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,300000), data = med_graph)
-medpredict$yhatploys <- predict(lmpolys, newdata = medpredict)
-lines(yhatploys ~ AGE, data = medpredict)
-max(medpredict) # peak predicted wage
+plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
+medpredictb$yhatpolys <- predict(lmpolys, newdata = medpredictb)
+lines(yhatpolys ~ AGE, data = medpredictb, col = "Purple" )
+lines(yhat ~ AGE, data = medpredictb, lty = 2)
+legend("topleft", c("Polynomials", "Squared"), col = c("Purple", "Black"), lty = c(1,2), bty = "n")
 ```
+When plotted, the curves follow a similar slope and shape. Adding the extra polynomials increases the maximum predicted wage slightly to
+```{r}
+max(medpredictb$yhatpolys)
+```
+but we notice a steepening of the "Polynomials" curve as age approaches 70.
 ```{r}
 # Hypothesis test of higher order polynomials - jointly significant
 coeftest(lmpolys,vcovHC)
