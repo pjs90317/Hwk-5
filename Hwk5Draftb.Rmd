@@ -17,7 +17,7 @@ dat_meda <- subset(acs2017_ny, use_varb)
 dat_med <- subset(dat_meda, select = -(veteran))
 detach()
 ```
-```{r include=FALSE}
+```{r echo=FALSE}
 library(AER)
 ```
 ```{r eval=FALSE}
@@ -46,14 +46,14 @@ table(deptime)
 sum(morning+daytime)
 detach()
 ```
-```{r echo=FALSE, eval=FALSE}
+```{r eval=FALSE}
 attach(dat_med)
 summary(INCWAGE)
 detach()
 ```
 For our initial regression, we elected to use the [INCWAGE](https://cps.ipums.org/cps-action/variables/INCWAGE#description_section) observations as our measure of wage. We made this decision as we believe it is reasonable to assume that most of the data observations in our subset (females in the medical field with a Bachelor or Advanced degree) would only hold one job. INCWAGE is 'the total pre-tax and salary income' each of the respondent's earned as an employee in the previous 12 months prior to the survey.
 
-```{r echo = FALSE}
+```{r}
 attach(dat_med)
 lma <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college))
 # summary(lma)

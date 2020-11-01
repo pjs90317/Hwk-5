@@ -2,6 +2,25 @@ Homework 5
 ================
 Patrick Sinclair, Kieran Yuen
 
+    ## Loading required package: car
+
+    ## Loading required package: carData
+
+    ## Loading required package: lmtest
+
+    ## Loading required package: zoo
+
+    ## 
+    ## Attaching package: 'zoo'
+
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     as.Date, as.Date.numeric
+
+    ## Loading required package: sandwich
+
+    ## Loading required package: survival
+
 For our subset, we decided to examine how different variables impact
 wages for people who identify as female working in the various aspects
 of the medical industry. We did this by creating an object that houses
