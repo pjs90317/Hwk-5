@@ -17,7 +17,7 @@ dat_meda <- subset(acs2017_ny, use_varb)
 dat_med <- subset(dat_meda, select = -(veteran))
 detach()
 ```
-```{r echo=FALSE}
+```{r include=FALSE}
 library(AER)
 ```
 ```{r eval=FALSE}
@@ -74,7 +74,15 @@ attach(dat_med)
 NNobs <- length(INCWAGE)
 set.seed(12345)
 graph_obs <- (runif(NNobs) < 0.5)
-med_graph <-subset(dat_med, graph_obs) 
+med_graph <-subset(dat_med, graph_obs)
+```
+```{r}
+png(filename="~/CCNY/Econometrics/Homework/Draft Hwk Files/Homework-5/Hwk-5/initlmplot.png")
+plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
+medpredict <- data.frame(AGE = 25:70, female = 1, educ_college = 1, educ_advdeg = 1)
+dev.off()
+```
+```{r}
 plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
 medpredict <- data.frame(AGE = 25:70, female = 1, educ_college = 1, educ_advdeg = 1)
 # medpredict$yhat <- predict(lma, newdata = medpredict)
@@ -106,12 +114,21 @@ suppressWarnings(stargazer(lmpolys, type = "text"))
 ```
 ```{r}
 # plots line on plot - peak wages AREN'T particularly different from those of the Aged^2 lm
+png(filename="~/CCNY/Econometrics/Homework/Draft Hwk Files/Homework-5/Hwk-5/polyplot.png")
 plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
 medpredictb$yhatpolys <- predict(lmpolys, newdata = medpredictb)
 lines(yhatpolys ~ AGE, data = medpredictb, col = "Purple" )
 lines(yhat ~ AGE, data = medpredictb, lty = 2)
 legend("topleft", c("Polynomials", "Squared"), col = c("Purple", "Black"), lty = c(1,2), bty = "n")
+dev.off()
 ```
+```{r}
+plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
+medpredictb$yhatpolys <- predict(lmpolys, newdata = medpredictb)
+lines(yhatpolys ~ AGE, data = medpredictb, col = "Purple" )
+lines(yhat ~ AGE, data = medpredictb, lty = 2)
+legend("topleft", c("Polynomials", "Squared"), col = c("Purple", "Black"), lty = c(1,2), bty = "n")
+```  
 When plotted, the curves follow a similar slope and shape. Adding the extra polynomials increases the maximum predicted wage slightly to
 ```{r}
 max(medpredictb$yhatpolys)

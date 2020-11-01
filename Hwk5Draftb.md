@@ -2,25 +2,6 @@ Homework 5
 ================
 Patrick Sinclair, Kieran Yuen
 
-    ## Loading required package: car
-
-    ## Loading required package: carData
-
-    ## Loading required package: lmtest
-
-    ## Loading required package: zoo
-
-    ## 
-    ## Attaching package: 'zoo'
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     as.Date, as.Date.numeric
-
-    ## Loading required package: sandwich
-
-    ## Loading required package: survival
-
 For our subset, we decided to examine how different variables impact
 wages for people who identify as female working in the various aspects
 of the medical industry. We did this by creating an object that houses
@@ -85,8 +66,12 @@ at different ages and the range of the INCWAGE axis has been capped at
 300,000.
 
 To draw some comparison from the linear regression, we set the
-prediction model to predict wages for those with advanced degrees.  
-![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-8-1.png)<!-- --> The plot
+prediction model to predict wages for those with advanced degrees.
+
+    ## png 
+    ##   2
+
+![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-10-1.png)<!-- --> The plot
 for the predicted values shows us a gently sloped concave curve that has
 a peak predicted value of
 
@@ -132,7 +117,10 @@ get progressively smaller.
     ## ========================================================================================
     ## Note:                                                        *p<0.1; **p<0.05; ***p<0.01
 
-![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-11-1.png)<!-- --> When
+    ## png 
+    ##   2
+
+![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-14-1.png)<!-- --> When
 plotted, the curves follow a similar slope and shape. Adding the extra
 polynomials increases the maximum predicted wage slightly to
 
@@ -174,7 +162,7 @@ a function of age.
 What if you used \(log(Age)\)? (And why would polynomials in
 \(log(Age)\) be useless? Experiment.)
 
-![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
     ## [1] 83344.81
 
