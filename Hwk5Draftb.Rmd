@@ -20,11 +20,6 @@ detach()
 ```{r include=FALSE}
 library(AER)
 ```
-```{r eval=FALSE}
-attach(dat_med)
-summary(dat_med)
-detach()
-```
 For our subset, we decided to examine how different variables impact wages for people who identify as female working in the various aspects of the medical industry. We did this by creating an object that houses different industry codes pertaining to the medical field, including physician and dentist offices, hospitals, nursing facilities and other health-care practitioners.
 ```{r eval=FALSE}
 # creating different objects for work departure time
@@ -44,11 +39,6 @@ table(morning)
 deptime <- factor((1*evening + 2*morning + 3*daytime + 4*graveyard), levels = c(1, 2, 3, 4), labels = c( "Night", "Grave", "Morn", "Mid"))
 table(deptime)
 sum(morning+daytime)
-detach()
-```
-```{r eval=FALSE}
-attach(dat_med)
-summary(INCWAGE)
 detach()
 ```
 For our initial regression, we elected to use the [INCWAGE](https://cps.ipums.org/cps-action/variables/INCWAGE#description_section) observations as our measure of wage. We made this decision as we believe it is reasonable to assume that most of the data observations in our subset (females in the medical field with a Bachelor or Advanced degree) would only hold one job. INCWAGE is 'the total pre-tax and salary income' each of the respondent's earned as an employee in the previous 12 months prior to the survey.
@@ -75,6 +65,7 @@ NNobs <- length(INCWAGE)
 set.seed(12345)
 graph_obs <- (runif(NNobs) < 0.5)
 med_graph <-subset(dat_med, graph_obs)
+detach()
 ```
 ```{r include = FALSE}
 png(filename="initlmplot.png")
@@ -84,25 +75,11 @@ medpredictb <- data.frame(AGE = 25:70, female = 1, educ_college = 0, educ_advdeg
 medpredictb$yhat <- predict(lma, newdata = medpredictb)
 lines(yhat ~ AGE, data = medpredictb)
 dev.off()
+
 ```
 
 ![initial regression plot](./initlmplot.png)
-```{r eval = FALSE}
-plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
-medpredict <- data.frame(AGE = 25:70, female = 1, educ_college = 1, educ_advdeg = 1)
-# medpredict$yhat <- predict(lma, newdata = medpredict)
-# lines(yhat ~ AGE, data = medpredict)
-# max(medpredict$yhat) # peak predicted wage
-medpredictb <- data.frame(AGE = 25:70, female = 1, educ_college = 0, educ_advdeg = 1)
-medpredictb$yhat <- predict(lma, newdata = medpredictb)
-lines(yhat ~ AGE, data = medpredictb)
-# plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,300000), data = med_graph)
-# medpredictb <- data.frame(AGE = 25:70, female = 1, educ_college = 0, educ_advdeg = 1)
-# medpredictb$yhat <- predict(lma, newdata = medpredictb)
-# lines(yhat ~ AGE, data = medpredictb, col = "blue")
-# max(medpredictb$yhat) # peak predicted wage
-detach()
-```
+
 The plot for the predicted values shows us a gently sloped concave curve that has a peak predicted value of
 ```{r}
 max(medpredictb$yhat)
@@ -110,15 +87,11 @@ detach()
 ```
 When we added high polynomials, $Age^3$, $Age^4$ and $Age^5$, to the regression, the absolute values of the corresponding coefficients get progressively smaller.
 ```{r}
-# sets up lm with polynomials included
 attach(dat_med)
 lmpolys <- lm((INCWAGE ~ AGE + I(AGE^2) + I(AGE^3) + I(AGE^4) + I(AGE^5) + educ_college))
-# summary(lma)
-# plot(lmpolys)
 suppressWarnings(stargazer(lmpolys, type = "text"))
 ```
 ```{r include=FALSE}
-# plots line on plot - peak wages AREN'T particularly different from those of the Aged^2 lm
 png(filename="~/CCNY/Econometrics/Homework/Draft Hwk Files/Homework-5/Hwk-5/polyplot.png")
 plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
 medpredictb$yhatpolys <- predict(lmpolys, newdata = medpredictb)
@@ -129,13 +102,6 @@ dev.off()
 ```
 ![Polynomial Regression](./polyplot.png)
 
-```{r eval=FALSE}
-plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
-medpredictb$yhatpolys <- predict(lmpolys, newdata = medpredictb)
-lines(yhatpolys ~ AGE, data = medpredictb, col = "Purple" )
-lines(yhat ~ AGE, data = medpredictb, lty = 2)
-legend("topleft", c("Polynomials", "Squared"), col = c("Purple", "Black"), lty = c(1,2), bty = "n")
-```  
 When plotted, the curves follow a similar slope and shape. Adding the extra polynomials increases the maximum predicted wage slightly to
 ```{r}
 max(medpredictb$yhatpolys)

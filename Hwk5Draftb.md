@@ -158,7 +158,7 @@ a function of age.
 What if you used \(log(Age)\)? (And why would polynomials in
 \(log(Age)\) be useless? Experiment.)
 
-![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
     ## [1] 83344.81
 
