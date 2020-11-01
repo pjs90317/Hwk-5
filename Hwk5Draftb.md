@@ -123,42 +123,31 @@ extra polynomials increases the maximum predicted wage slightly to
     ## [1] 120590.2
 
 but we notice a steepening of the “Polynomials” curve as age approaches
-70.
-
-    ## 
-    ## t test of coefficients:
-    ## 
-    ##                 Estimate  Std. Error  t value Pr(>|t|)    
-    ## (Intercept)  -1.0695e+05  1.0105e+06  -0.1058   0.9157    
-    ## AGE           6.7018e+03  1.2162e+05   0.0551   0.9561    
-    ## I(AGE^2)      2.8299e+02  5.6859e+03   0.0498   0.9603    
-    ## I(AGE^3)     -1.6410e+01  1.2913e+02  -0.1271   0.8989    
-    ## I(AGE^4)      2.7566e-01  1.4267e+00   0.1932   0.8468    
-    ## I(AGE^5)     -1.5706e-03  6.1468e-03  -0.2555   0.7983    
-    ## educ_college -3.5144e+04  3.0778e+03 -11.4186   <2e-16 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+70. Running a joint hypothesis shows us that the higher-order polynomial
+terms are not significant; i.e. they have next to relationship with how
+wages are determined within the dataset.
 
     ## Linear hypothesis test
     ## 
     ## Hypothesis:
-    ## I(AGE^2)  + I(AGE^3)  + I(AGE^4)  + I(AGE^5) = 0
+    ## I(AGE^3)  + I(AGE^4)  + I(AGE^5) = 0
     ## 
     ## Model 1: restricted model
     ## Model 2: INCWAGE ~ AGE + I(AGE^2) + I(AGE^3) + I(AGE^4) + I(AGE^5) + educ_college
     ## 
     ##   Res.Df        RSS Df Sum of Sq      F Pr(>F)
     ## 1   2620 1.4324e+13                           
-    ## 2   2619 1.4324e+13  1   9410454 0.0017 0.9669
+    ## 2   2619 1.4324e+13  1  67104124 0.0123 0.9118
 
-Do a hypothesis test of whether all of those higher-order polynomial
-terms are jointly significant. Describe the pattern of predicted wage as
-a function of age.
+In both regression, wages as a function of age trend upwards. Wage peaks
+at the age of 55 in the initial regression model but peaks later, at 59,
+in the polynomial model. The range of predicted wages is larger in the
+polynomial model by 4549.3295301
 
 What if you used \(log(Age)\)? (And why would polynomials in
 \(log(Age)\) be useless? Experiment.)
 
-![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
     ## [1] 83344.81
 
@@ -190,54 +179,6 @@ Why don’t we use polynomial terms of dummy variables? Experiment.
 
 What is the predicted wage, from your model, for a few relevant cases?
 Do those seem reasonable?
-
-    ##    AGE female educ_college educ_advdeg      yhat yhatpolys
-    ## 1   25      1            0           1  76843.65  73395.18
-    ## 2   26      1            0           1  79606.46  77480.12
-    ## 3   27      1            0           1  82276.77  81255.21
-    ## 4   28      1            0           1  84854.57  84731.10
-    ## 5   29      1            0           1  87339.87  87919.98
-    ## 6   30      1            0           1  89732.67  90835.37
-    ## 7   31      1            0           1  92032.97  93491.93
-    ## 8   32      1            0           1  94240.76  95905.31
-    ## 9   33      1            0           1  96356.05  98091.90
-    ## 10  34      1            0           1  98378.84 100068.70
-    ## 11  35      1            0           1 100309.13 101853.09
-    ## 12  36      1            0           1 102146.92 103462.66
-    ## 13  37      1            0           1 103892.20 104915.04
-    ## 14  38      1            0           1 105544.98 106227.66
-    ## 15  39      1            0           1 107105.25 107417.60
-    ## 16  40      1            0           1 108573.03 108501.42
-    ## 17  41      1            0           1 109948.30 109494.91
-    ## 18  42      1            0           1 111231.07 110412.96
-    ## 19  43      1            0           1 112421.34 111269.33
-    ## 20  44      1            0           1 113519.10 112076.50
-    ## 21  45      1            0           1 114524.37 112845.46
-    ## 22  46      1            0           1 115437.13 113585.50
-    ## 23  47      1            0           1 116257.38 114304.06
-    ## 24  48      1            0           1 116985.14 115006.54
-    ## 25  49      1            0           1 117620.39 115696.07
-    ## 26  50      1            0           1 118163.14 116373.37
-    ## 27  51      1            0           1 118613.39 117036.52
-    ## 28  52      1            0           1 118971.14 117680.82
-    ## 29  53      1            0           1 119236.38 118298.56
-    ## 30  54      1            0           1 119409.12 118878.83
-    ## 31  55      1            0           1 119489.36 119407.37
-    ## 32  56      1            0           1 119477.10 119866.35
-    ## 33  57      1            0           1 119372.33 120234.18
-    ## 34  58      1            0           1 119175.06 120485.35
-    ## 35  59      1            0           1 118885.29 120590.21
-    ## 36  60      1            0           1 118503.02 120514.80
-    ## 37  61      1            0           1 118028.24 120220.65
-    ## 38  62      1            0           1 117460.96 119664.60
-    ## 39  63      1            0           1 116801.18 118798.62
-    ## 40  64      1            0           1 116048.90 117569.58
-    ## 41  65      1            0           1 115204.11 115919.14
-    ## 42  66      1            0           1 114266.82 113783.46
-    ## 43  67      1            0           1 113237.03 111093.10
-    ## 44  68      1            0           1 112114.74 107772.79
-    ## 45  69      1            0           1 110899.94 103741.25
-    ## 46  70      1            0           1 109592.64  98910.99
 
 What is difference in regression from using log wage as the dependent
 variable? Compare the pattern of predicted values from the two models
