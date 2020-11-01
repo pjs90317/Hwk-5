@@ -68,8 +68,10 @@ at different ages and the range of the INCWAGE axis has been capped at
 To draw some comparison from the linear regression, we set the
 prediction model to predict wages for those with advanced degrees.
 
-    ## png 
-    ##   2
+![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+    ## null device 
+    ##           1
 
 ![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-10-1.png)<!-- --> The plot
 for the predicted values shows us a gently sloped concave curve that has
@@ -117,8 +119,10 @@ get progressively smaller.
     ## ========================================================================================
     ## Note:                                                        *p<0.1; **p<0.05; ***p<0.01
 
-    ## png 
-    ##   2
+![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
+    ## null device 
+    ##           1
 
 ![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-14-1.png)<!-- --> When
 plotted, the curves follow a similar slope and shape. Adding the extra
