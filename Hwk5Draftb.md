@@ -312,3 +312,5 @@ Glied, Sherry A., Ma, Stephanie and Pearlstein, Ivanna, (2015).
 “Understanding Pay Differentials Among Health Professionals,
 Nonprofessionals, And Their Counterparts In Other Sectors”
 <https://www.healthaffairs.org/doi/full/10.1377/hlthaff.2014.1367>
+
+Our Regression Model: Departure Time and Health Insurance

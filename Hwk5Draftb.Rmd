@@ -90,13 +90,11 @@ lmpolys <- lm((INCWAGE ~ AGE + I(AGE^2) + I(AGE^3) + I(AGE^4) + I(AGE^5) + educ_
 suppressWarnings(stargazer(lmpolys, type = "text"))
 ```
 ```{r include=FALSE}
-png(filename="~/CCNY/Econometrics/Homework/Draft Hwk Files/Homework-5/Hwk-5/polyplot.png")
 plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
 medpredictb$yhatpolys <- predict(lmpolys, newdata = medpredictb)
 lines(yhatpolys ~ AGE, data = medpredictb, col = "Purple" )
 lines(yhat ~ AGE, data = medpredictb, lty = 2)
 legend("topleft", c("Polynomials", "Squared"), col = c("Purple", "Black"), lty = c(1,2), bty = "n")
-dev.off()
 ```
 ```{r}
 polymax <- max(medpredictb$yhatpolys)
@@ -121,22 +119,18 @@ The log function demonstrates that the percentage changes in wage relative to th
 
 ```{r include=FALSE}
 lmlog <- lm((INCWAGE ~ AGE + log(AGE) + educ_college))
-png(filename="~/CCNY/Econometrics/Homework/Draft Hwk Files/Homework-5/Hwk-5/logplot.png")
 plot(INCWAGE ~ jitter(AGE, factor = 1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.1), ylim = c(0,300000), data = med_graph)
 medpredictb$yhatlog <- predict(lmlog, newdata = medpredictb)
 lines(yhatlog ~ AGE, data = medpredictb, col = "Red")
 lines(yhatpolys ~ AGE, data = medpredictb, col = "Purple" )
 lines(yhat ~ AGE, data = medpredictb, lty = 2)
 legend("topleft", c("Logs", "Polynomials", "Squared"), col = c("Red", "Purple", "Black"), lty = c(1,1,2), bty = "n")
-dev.off()
 logmax <- max(medpredictb$yhatlog)
 comptable <- medpredictb[c(1,5,6,7)]
-png(filename="~/CCNY/Econometrics/Homework/Draft Hwk Files/Homework-5/Hwk-5/solologplot.png")
 plot(INCWAGE ~ jitter(AGE, factor = 1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.1), ylim = c(0,300000), data = med_graph)
 medpredictb$yhatlog <- predict(lmlog, newdata = medpredictb)
 lines(yhatlog ~ AGE, data = medpredictb, col = "Red")
 legend("topleft", "Logs", col = "Red", lty = 1, bty = "n")
-dev.off()
 ```
 
 **Dummy Variables**  
@@ -168,12 +162,10 @@ What is difference in regression from using log wage as the dependent variable? 
 By changing the dependent variable to log(INCWAGE), we encountered an error as there are 45 observations in the dataset that have INCWAGE = 0. To get around this issue, we asked the regression to take $log(INCWAGE + 1)$ to remove the issues of the 0 values whilst minimizing the impact on the other observations. The observed values are generally big enough that the addition of 1 does not impact the log of the observations with any significance.
 ```{r include=FALSE}
 lmlogb <- lm(log(INCWAGE + 1) ~ AGE + log(AGE) + educ_college)
-png(filename="~/CCNY/Econometrics/Homework/Draft Hwk Files/Homework-5/Hwk-5/logfunlogplot.png")
 plot(log(INCWAGE + 1) ~ jitter(AGE, factor = 2), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.1), ylim = c(0,20), data = med_graph)
 medpredictb$yhatlogfun <- predict(lmlogb, newdata = medpredictb)
 lines(yhatlogfun ~ AGE, data = medpredictb, col = "Orange")
 legend("topleft", "Logs of logs", col = "Orange", lty = 1, bty = "n")
-dev.off()
 ```
 Here we compare INCWAGE ~ log(AGE) and log(INCWAGE + 1) ~ log(AGE)
 
@@ -204,3 +196,52 @@ What are the other variables you are using in your regression? Do they have the 
 https://cps.ipums.org/cps-action/variables/INCWAGE#description_section
 
 Glied, Sherry A., Ma, Stephanie  and Pearlstein, Ivanna, (2015). "Understanding Pay Differentials Among Health Professionals, Nonprofessionals, And Their Counterparts In Other Sectors" https://www.healthaffairs.org/doi/full/10.1377/hlthaff.2014.1367
+
+Our Regression Model: Departure Time and Health Insurance
+
+```{r, eval= FALSE}
+#In designing our regression model to create the best predictions for a person's wages, we wanted to try variables we have not used before. We arrived on using departure time and health insurance. 
+
+#We chose departure time because we thought that the time someone leaves for work would be a strong indicator of how much they make in wages. We believe that most people would want to work (and go to work) during daytime hours as this matches research shown that human biology follows a cycle where our brains are programmed to be awake and more alert during the sunny hours and start to wind down during the nighttime in preparation for rest. They call this the day and night cycle the circadian rhythm (https://www.sleepfoundation.org/circadian-rhythm#:~:text=The%20sleep%2Dwake%20cycle%20is,keep%20us%20awake%20and%20active). And research has also shown that it is hard for us humans to purposefully adjust our circadian rhythems so we can be more alert during nighttime hours (insert research link here). Therefore, we would expect that those who have departure times during the day time would have higher incomes than those who have "less desirable" departure times, such as a graveyard shift at a hospital.
+
+#We also chose health insurance as we thought this would be an easy way to distinguish between higher wages and lower waged people. We are expecting to see that people with health insurance probably have higher wages and people without health insurance have lower wages. This is because health insurance is seen as a "benefit" that the employer is providing to the employee. 
+
+lmDepHealth <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college + deptime + HCOVANY))
+summary(lmDepHealth)
+
+#Results: The results of this regression analysis where we put both departure time and health insurance seem to indicate that when put together, health insurance has a very high p-value, which indicates to us that there may not be a relationship that exists between health insurance and wages. This might be because the top half of wage-earners have a higher percentage of health insurance and the bottom half of wage-earners really do not have health insurance. The t-value of 0.826 is telling us that the coefficient estimate  for health insurance is not very far away from "zero," which would indicate no relationship existing between wages and health insurance.
+
+#Let's try to run a regression with only the health insurance variable to see if the p-value is the same.
+```
+
+
+```{r, eval= FALSE}
+lmDepHealth1 <- lm((INCWAGE ~ AGE + I(AGE^2) + HCOVANY))
+summary(lmDepHealth1)
+
+#Results: running the health insurance variable by itself appears to still show a high p-value of ~0.19885 which is reaffirming to us that there is not a statistically significant relationship between health insurance and wages. In other words, we would fail to reject the null hypothesis that "no relationship exists between health insurance and wages." 
+
+#The variable health insurance would not be useful in helping us predict wages. We will not include it in our regression model.
+
+#Now, let's focus on departure time. We will run a regression model for that next.
+```
+
+
+```{r, eval= FALSE}
+lmDepHealth2 <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college + deptime))
+summary(lmDepHealth2)
+
+#Running this regression model with the departure time shows p-values of ~0.09 for Night and Graveyard departure times where we would fail to reject the null hypothesis at at the 5% level of significance, perhaps saying that there is no relationship between Night and Graveyard departure times and wages. The "mid" (9am - 5pm) departure time appears to show that there is a relationship between leaving for work between the hours fo 9am - 5pm and a person's wages. But the estimated coefficient for mid seems to tell us that it has a negative correlation with wages, in other words, departing for work between 9am-5pm would indicate a person would have lower wages.
+
+#We also see that one of our departure time dummy variables has been dropped off, namely the morning departure times of 5am-9am, which is probably workers who mostly work in offices.
+```
+
+
+```{r, eval= FALSE}
+plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
+medpredict1 <- data.frame(AGE = 25:70, female = 1, educ_college = 1, deptime = "Mid", HCOVANY = 1)
+medpredict1$yhat <- predict(lmDepHealth, newdata = medpredict1)
+lines(yhat ~ AGE, data = medpredict1)
+max(medpredict1$yhat) #peak predicted wage
+print(medpredict1)
+```
