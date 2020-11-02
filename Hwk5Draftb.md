@@ -193,80 +193,36 @@ has a succinct depiction of the differences between Physicians, Nurses
 and other health industry workers in the first results table. Their data
 comes from the 2014 CPS data and is reported in 2013 dollars.
 
-What is difference in regression from using log wage as the dependent
-variable? Compare the pattern of predicted values from the two models
-(remember to take exp() of the predicted value, where the dependent is
-log wage). Discuss.
-
+**Elasticity**  
 By changing the dependent variable to log(INCWAGE), we encountered an
 error as there are 45 observations in the dataset that have INCWAGE = 0.
 To get around this issue, we asked the regression to take
-\(log(INCWAGE + 1)\) to remove the issues of the 0 values whilst
+\(log(INCWAGE + 1)\) to remove the issue of the 0 values whilst
 minimizing the impact on the other observations. The observed values are
 generally big enough that the addition of 1 does not impact the log of
 the observations with any significance.
+![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 Here we compare INCWAGE \~ log(AGE) and log(INCWAGE + 1) \~ log(AGE)
 
 ![log plot](./solologplot.png) ![log of log plot](./logfunlogplot.png)
 
-    ##    AGE female educ_college educ_advdeg
-    ## 1   25      1            1           1
-    ## 2   26      1            1           1
-    ## 3   27      1            1           1
-    ## 4   28      1            1           1
-    ## 5   29      1            1           1
-    ## 6   30      1            1           1
-    ## 7   31      1            1           1
-    ## 8   32      1            1           1
-    ## 9   33      1            1           1
-    ## 10  34      1            1           1
-    ## 11  35      1            1           1
-    ## 12  36      1            1           1
-    ## 13  37      1            1           1
-    ## 14  38      1            1           1
-    ## 15  39      1            1           1
-    ## 16  40      1            1           1
-    ## 17  41      1            1           1
-    ## 18  42      1            1           1
-    ## 19  43      1            1           1
-    ## 20  44      1            1           1
-    ## 21  45      1            1           1
-    ## 22  46      1            1           1
-    ## 23  47      1            1           1
-    ## 24  48      1            1           1
-    ## 25  49      1            1           1
-    ## 26  50      1            1           1
-    ## 27  51      1            1           1
-    ## 28  52      1            1           1
-    ## 29  53      1            1           1
-    ## 30  54      1            1           1
-    ## 31  55      1            1           1
-    ## 32  56      1            1           1
-    ## 33  57      1            1           1
-    ## 34  58      1            1           1
-    ## 35  59      1            1           1
-    ## 36  60      1            1           1
-    ## 37  61      1            1           1
-    ## 38  62      1            1           1
-    ## 39  63      1            1           1
-    ## 40  64      1            1           1
-    ## 41  65      1            1           1
-    ## 42  66      1            1           1
-    ## 43  67      1            1           1
-    ## 44  68      1            1           1
-    ## 45  69      1            1           1
-    ## 46  70      1            1           1
+    ##   AGE  yhatlog yhatlogfun
+    ## 1  25 73958.43   10.74424
+    ## 2  26 77678.45   10.79046
+    ## 3  27 81141.96   10.83278
+    ## 4  28 84367.65   10.87147
+    ## 5  29 87372.20   10.90679
+    ## 6  30 90170.61   10.93897
 
-    ## Warning in mean.default(medpredict$yhat): argument is not numeric or logical:
-    ## returning NA
-
-    ## [1] NA
-
-    ## Warning in mean.default(medpredict$yhatlog): argument is not numeric or logical:
-    ## returning NA
-
-    ## [1] NA
+Changing our dependent variable to log(INCWAGE + 1) depicts the
+percentage change in wages in response to a percentage change in age.
+While the pattern of predicted values in the regression with INCWAGE
+trends upwards until age reaches the mid 50s, then begins to trend down,
+the predicted values for log(INCWAGE + 1) stay consistent at
+approximately 11.0375274. If we take the log of this value, we see that
+a 1% increase in age has a corresponding average increase of 2.4013011
+in wages. **Discuss.**
 
 Try some interactions, like this,
 
