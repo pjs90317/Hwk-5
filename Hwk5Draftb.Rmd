@@ -20,11 +20,6 @@ detach()
 ```{r include=FALSE}
 library(AER)
 ```
-```{r eval=FALSE}
-attach(dat_med)
-summary(dat_med)
-detach()
-```
 For our subset, we decided to examine how different variables impact wages for people who identify as female working in the various aspects of the medical industry. We did this by creating an object that houses different industry codes pertaining to the medical field, including physician and dentist offices, hospitals, nursing facilities and other health-care practitioners.
 ```{r eval=FALSE}
 # creating different objects for work departure time
@@ -41,14 +36,9 @@ summary(morning)
 summary(daytime)
 summary(evening)
 table(morning)
-deptime <- factor((1*evening + 2*morning + 3*daytime + 4*graveyard), levels = c(1, 2, 3, 4), labels = c( "Night", "Grave", "Morn", "Mid"))
+deptime <- factor((1*morning + 2*evening + 3*daytime + 4*graveyard), levels = c(1, 2, 3, 4), labels = c( "Morn", "Night", "Mid", "Grave"))
 table(deptime)
 sum(morning+daytime)
-detach()
-```
-```{r eval=FALSE}
-attach(dat_med)
-summary(INCWAGE)
 detach()
 ```
 For our initial regression, we elected to use the [INCWAGE](https://cps.ipums.org/cps-action/variables/INCWAGE#description_section) observations as our measure of wage. We made this decision as we believe it is reasonable to assume that most of the data observations in our subset (females in the medical field with a Bachelor or Advanced degree) would only hold one job. INCWAGE is 'the total pre-tax and salary income' each of the respondent's earned as an employee in the previous 12 months prior to the survey.
@@ -75,29 +65,21 @@ NNobs <- length(INCWAGE)
 set.seed(12345)
 graph_obs <- (runif(NNobs) < 0.5)
 med_graph <-subset(dat_med, graph_obs)
+detach()
 ```
-```{r}
-#png(filename="~/CCNY/Econometrics/Homework/Draft Hwk Files/Homework-5/Hwk-5/initlmplot.png")
+```{r include = FALSE}
+png(filename="initlmplot.png")
 plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
 medpredict <- data.frame(AGE = 25:70, female = 1, educ_college = 1, educ_advdeg = 1)
-dev.off()
-```
-```{r}
-plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
-medpredict <- data.frame(AGE = 25:70, female = 1, educ_college = 1, educ_advdeg = 1)
-# medpredict$yhat <- predict(lma, newdata = medpredict)
-# lines(yhat ~ AGE, data = medpredict)
-# max(medpredict$yhat) # peak predicted wage
 medpredictb <- data.frame(AGE = 25:70, female = 1, educ_college = 0, educ_advdeg = 1)
 medpredictb$yhat <- predict(lma, newdata = medpredictb)
 lines(yhat ~ AGE, data = medpredictb)
-# plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,300000), data = med_graph)
-# medpredictb <- data.frame(AGE = 25:70, female = 1, educ_college = 0, educ_advdeg = 1)
-# medpredictb$yhat <- predict(lma, newdata = medpredictb)
-# lines(yhat ~ AGE, data = medpredictb, col = "blue")
-# max(medpredictb$yhat) # peak predicted wage
-detach()
+dev.off()
+
 ```
+
+![initial regression plot](./initlmplot.png)
+
 The plot for the predicted values shows us a gently sloped concave curve that has a peak predicted value of
 ```{r}
 max(medpredictb$yhat)
@@ -105,15 +87,11 @@ detach()
 ```
 When we added high polynomials, $Age^3$, $Age^4$ and $Age^5$, to the regression, the absolute values of the corresponding coefficients get progressively smaller.
 ```{r}
-# sets up lm with polynomials included
 attach(dat_med)
 lmpolys <- lm((INCWAGE ~ AGE + I(AGE^2) + I(AGE^3) + I(AGE^4) + I(AGE^5) + educ_college))
-# summary(lma)
-# plot(lmpolys)
 suppressWarnings(stargazer(lmpolys, type = "text"))
 ```
-```{r}
-# plots line on plot - peak wages AREN'T particularly different from those of the Aged^2 lm
+```{r include=FALSE}
 #png(filename="~/CCNY/Econometrics/Homework/Draft Hwk Files/Homework-5/Hwk-5/polyplot.png")
 plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
 medpredictb$yhatpolys <- predict(lmpolys, newdata = medpredictb)
@@ -122,30 +100,27 @@ lines(yhat ~ AGE, data = medpredictb, lty = 2)
 legend("topleft", c("Polynomials", "Squared"), col = c("Purple", "Black"), lty = c(1,2), bty = "n")
 dev.off()
 ```
-```{r}
-plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
-medpredictb$yhatpolys <- predict(lmpolys, newdata = medpredictb)
-lines(yhatpolys ~ AGE, data = medpredictb, col = "Purple" )
-lines(yhat ~ AGE, data = medpredictb, lty = 2)
-legend("topleft", c("Polynomials", "Squared"), col = c("Purple", "Black"), lty = c(1,2), bty = "n")
-```  
+![Polynomial Regression](./polyplot.png)
+
 When plotted, the curves follow a similar slope and shape. Adding the extra polynomials increases the maximum predicted wage slightly to
 ```{r}
 max(medpredictb$yhatpolys)
 ```
-but we notice a steepening of the "Polynomials" curve as age approaches 70.
+but we notice a steepening of the "Polynomials" curve as age approaches 70. Running a joint hypothesis shows us that the higher-order polynomial terms are not significant; i.e. they have next to relationship with how wages are determined within the dataset.
+
+```{r incldue=FALSE}
+polyrange <- sum(max(medpredictb$yhatpolys)-min(medpredictb$yhatpolys))
+initialrange <- sum(max(medpredictb$yhat)-min(medpredictb$yhat))
+```
 ```{r}
-# Hypothesis test of higher order polynomials - jointly significant
-coeftest(lmpolys,vcovHC)
-require(car)
-# or
-linearHypothesis(lmpolys, "I(AGE^2) + I(AGE^3) + I(AGE^4) + I(AGE^5) = 0", test="F")
+linearHypothesis(lmpolys, "I(AGE^3) + I(AGE^4) + I(AGE^5) = 0", test="F")
 ```
 
-Do a hypothesis test of whether all of those higher-order polynomial terms are jointly significant. Describe the pattern of predicted wage as a function of age. 
+In both regression, wages as a function of age trend upwards. Wage peaks at the age of 55 in the initial regression model but peaks later, at 59, in the polynomial model. The range of predicted wages is larger in the polynomial model by `r sum(polyrange-initialrange)`
+
 
 ```{r}
-# The pattern of predicted wage trends upward until age reaches the mid 50s, plateaus until approximately 57 years old then trends down towards 70 years old.
+comptable <- medpredictb[c(1,5,6)]
 ```
 
 What if you used $log(Age)$? (And why would polynomials in $log(Age)$ be useless? Experiment.)
@@ -176,14 +151,15 @@ Why don't we use polynomial terms of dummy variables? Experiment.
 # We don't use polynomials of dummy variables as they have no effect on the regression - 1^x = 1; 0^x = 0.
 ```
 What is the predicted wage, from your model, for a few relevant cases? Do those seem reasonable?
-```{r}
+```{r eval=FALSE}
 # check wage as a function of age for lma and medpredict
 # we can also change the medpredict objects to use the poly regression or the log regression
 medpredictc <- data.frame(AGE = 25:70, female = 1, educ_college = 1, educ_advdeg = 0)
 medpredictc$yhat <- predict(lma, newdata = medpredictc)
 medpredict
 medpredictb
-medpredictc
+# medpredictc
+comptable
 ```
 
 What is difference in regression from using log wage as the dependent variable? Compare the pattern of predicted values from the two models (remember to take exp() of the predicted value, where the dependent is log wage). Discuss.
@@ -206,6 +182,57 @@ lminterb
 and explain those outputs (different peaks for different groups).
 
 What are the other variables you are using in your regression? Do they have the expected signs and patterns of significance? Explain if there is a plausible causal link from X variables to Y and not the reverse. Explain your results, giving details about the estimation, some predicted values, and providing any relevant graphics. Impress.
+
+
+
+Our Regression Model: Departure Time and Health Insurance
+
+```{r, eval= FALSE}
+#In designing our regression model to create the best predictions for a person's wages, we wanted to try variables we have not used before. We arrived on using departure time and health insurance. 
+
+#We chose departure time because we thought that the time someone leaves for work would be a strong indicator of how much they make in wages. We believe that most people would want to work (and go to work) during daytime hours as this matches research shown that human biology follows a cycle where our brains are programmed to be awake and more alert during the sunny hours and start to wind down during the nighttime in preparation for rest. They call this the day and night cycle the circadian rhythm (https://www.sleepfoundation.org/circadian-rhythm#:~:text=The%20sleep%2Dwake%20cycle%20is,keep%20us%20awake%20and%20active). And research has also shown that it is hard for us humans to purposefully adjust our circadian rhythems so we can be more alert during nighttime hours (insert research link here). Therefore, we would expect that those who have departure times during the day time would have higher incomes than those who have "less desirable" departure times, such as a graveyard shift at a hospital.
+
+#We also chose health insurance as we thought this would be an easy way to distinguish between higher wages and lower waged people. We are expecting to see that people with health insurance probably have higher wages and people without health insurance have lower wages. This is because health insurance is seen as a "benefit" that the employer is providing to the employee. 
+
+lmDepHealth <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college + deptime + HCOVANY))
+summary(lmDepHealth)
+
+#Results: The results of this regression analysis where we put both departure time and health insurance seem to indicate that when put together, health insurance has a very high p-value, which indicates to us that there may not be a relationship that exists between health insurance and wages. This might be because the top half of wage-earners have a higher percentage of health insurance and the bottom half of wage-earners really do not have health insurance. The t-value of 0.826 is telling us that the coefficient estimate  for health insurance is not very far away from "zero," which would indicate no relationship existing between wages and health insurance.
+
+#Let's try to run a regression with only the health insurance variable to see if the p-value is the same.
+```
+
+
+```{r, eval= FALSE}
+lmDepHealth1 <- lm((INCWAGE ~ AGE + I(AGE^2) + HCOVANY))
+summary(lmDepHealth1)
+
+#Results: running the health insurance variable by itself appears to still show a high p-value of ~0.19885 which is reaffirming to us that there is not a statistically significant relationship between health insurance and wages. In other words, we would fail to reject the null hypothesis that "no relationship exists between health insurance and wages." 
+
+#The variable health insurance would not be useful in helping us predict wages. We will not include it in our regression model.
+
+#Now, let's focus on departure time. We will run a regression model for that next.
+```
+
+
+```{r, eval= FALSE}
+lmDepHealth2 <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college + deptime))
+summary(lmDepHealth2)
+
+#Running this regression model with the departure time shows p-values of ~0.09 for Night and Graveyard departure times where we would fail to reject the null hypothesis at at the 5% level of significance, perhaps saying that there is no relationship between Night and Graveyard departure times and wages. The "mid" (9am - 5pm) departure time appears to show that there is a relationship between leaving for work between the hours fo 9am - 5pm and a person's wages. But the estimated coefficient for mid seems to tell us that it has a negative correlation with wages, in other words, departing for work between 9am-5pm would indicate a person would have lower wages.
+
+#We also see that one of our departure time dummy variables has been dropped off, namely the morning departure times of 5am-9am, which is probably workers who mostly work in offices.
+```
+
+
+```{r, eval= FALSE}
+plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
+medpredict1 <- data.frame(AGE = 25:70, female = 1, educ_college = 1, deptime = "Mid", HCOVANY = 1)
+medpredict1$yhat <- predict(lmDepHealth, newdata = medpredict1)
+lines(yhat ~ AGE, data = medpredict1)
+max(medpredict1$yhat) #peak predicted wage
+print(medpredict1)
+```
 
 ### Bibliography
 https://cps.ipums.org/cps-action/variables/INCWAGE#description_section
