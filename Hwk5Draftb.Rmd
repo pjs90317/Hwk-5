@@ -7,6 +7,7 @@ output: github_document
 ```{r include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 library(stargazer)
+library(dplyr)
 load("acs2017_ny_data.RData")
 ```
 ```{r}
@@ -75,16 +76,13 @@ medpredictb <- data.frame(AGE = 25:70, female = 1, educ_college = 0, educ_advdeg
 medpredictb$yhat <- predict(lma, newdata = medpredictb)
 lines(yhat ~ AGE, data = medpredictb)
 dev.off()
-
+initmax <- max(medpredictb$yhat)
 ```
 
 ![initial regression plot](./initlmplot.png)
 
-The plot for the predicted values shows us a gently sloped concave curve that has a peak predicted value of
-```{r}
-max(medpredictb$yhat)
-detach()
-```
+The plot for the predicted values shows us a gently sloped concave curve that has a peak predicted value of `r format(round(initmax, digits = 2), scientific=FALSE)`.
+
 When we added high polynomials, $Age^3$, $Age^4$ and $Age^5$, to the regression, the absolute values of the corresponding coefficients get progressively smaller.
 ```{r}
 attach(dat_med)
@@ -100,13 +98,12 @@ lines(yhat ~ AGE, data = medpredictb, lty = 2)
 legend("topleft", c("Polynomials", "Squared"), col = c("Purple", "Black"), lty = c(1,2), bty = "n")
 dev.off()
 ```
+```{r}
+polymax <- max(medpredictb$yhatpolys)
+```
 ![Polynomial Regression](./polyplot.png)
 
-When plotted, the curves follow a similar slope and shape. Adding the extra polynomials increases the maximum predicted wage slightly to
-```{r}
-max(medpredictb$yhatpolys)
-```
-but we notice a steepening of the "Polynomials" curve as age approaches 70. Running a joint hypothesis shows us that the higher-order polynomial terms are not significant; i.e. they have next to relationship with how wages are determined within the dataset.
+When plotted, the curves follow a similar slope and shape. Adding the extra polynomials increases the maximum predicted wage slightly to `r format(round(polymax, digits = 2), scientific=FALSE)` but we notice a steepening of the "Polynomials" curve as age approaches 70. Running a joint hypothesis shows us that the higher-order polynomial terms are not significant; i.e. they have next to relationship with how wages are determined within the dataset.
 
 ```{r incldue=FALSE}
 polyrange <- sum(max(medpredictb$yhatpolys)-min(medpredictb$yhatpolys))
@@ -116,41 +113,45 @@ initialrange <- sum(max(medpredictb$yhat)-min(medpredictb$yhat))
 linearHypothesis(lmpolys, "I(AGE^3) + I(AGE^4) + I(AGE^5) = 0", test="F")
 ```
 
-In both regression, wages as a function of age trend upwards. Wage peaks at the age of 55 in the initial regression model but peaks later, at 59, in the polynomial model. The range of predicted wages is larger in the polynomial model by `r sum(polyrange-initialrange)`
+In both regression, wages as a function of age trend upwards. Wage peaks at the age of 55 in the initial regression model but peaks later, at 59, in the polynomial model. The range of predicted wages is larger in the polynomial model by `r round(sum(polyrange-initialrange), digits=2)`
 
+If we use $log(Age)$ in our regression instead, we can clearly see that the log function flattens the predicted values towards the upper end of our age range.  
+![log regression plot](./logplot.png)  
+The log function demonstrates that the percentage changes in wage relative to the increase in age are small compared to wage changes for younger workers. The log regression curve also shows us the impact of outliers on the higher-order polynomials regression.
 
-```{r}
-comptable <- medpredictb[c(1,5,6)]
-```
-
-What if you used $log(Age)$? (And why would polynomials in $log(Age)$ be useless? Experiment.)
-
-```{r}
+```{r include=FALSE}
 lmlog <- lm((INCWAGE ~ AGE + log(AGE) + educ_college))
-# plot(lmlog)
-plot(INCWAGE ~ jitter(AGE, factor = 1), pch = 16, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,300000), data = med_graph)
-medpredict$yhatlog <- predict(lmlog, newdata = medpredict)
-lines(yhatlog ~ AGE, data = medpredict)
-max(medpredict) # peak predicted wage
-# using log(AGE) smooths the curve towards the upper end of the age range. We shouldn't use polynomials as they will undo the impact of the log function.
+png(filename="~/CCNY/Econometrics/Homework/Draft Hwk Files/Homework-5/Hwk-5/logplot.png")
+plot(INCWAGE ~ jitter(AGE, factor = 1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.1), ylim = c(0,300000), data = med_graph)
+medpredictb$yhatlog <- predict(lmlog, newdata = medpredictb)
+lines(yhatlog ~ AGE, data = medpredictb, col = "Red")
+lines(yhatpolys ~ AGE, data = medpredictb, col = "Purple" )
+lines(yhat ~ AGE, data = medpredictb, lty = 2)
+legend("topleft", c("Logs", "Polynomials", "Squared"), col = c("Red", "Purple", "Black"), lty = c(1,1,2), bty = "n")
+dev.off()
+logmax <- max(medpredictb$yhatlog)
+comptable <- medpredictb[c(1,5,6,7)]
+png(filename="~/CCNY/Econometrics/Homework/Draft Hwk Files/Homework-5/Hwk-5/solologplot.png")
+plot(INCWAGE ~ jitter(AGE, factor = 1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.1), ylim = c(0,300000), data = med_graph)
+medpredictb$yhatlog <- predict(lmlog, newdata = medpredictb)
+lines(yhatlog ~ AGE, data = medpredictb, col = "Red")
+legend("topleft", "Logs", col = "Red", lty = 1, bty = "n")
+dev.off()
 ```
 
-Recall about how dummy variables work. If you added educ_hs in a regression using the subset given above, what would that do? (Experiment, if you aren't sure.) What is interpretation of coefficient on *educ_college* in that subset? What would happen if you put both *educ_college* and *educ_advdeg* into a regression? Are your other dummy variables in the regression working sensibly with your selection criteria?
+**Dummy Variables**  
+Were we to add the *educ_hs* dummy variable into this regression it would have zero effect because our dataset only includes those with a Bachelor or Advanced degree. However, if we add both the *educ_college* and *educ_advdeg*, we fall into the dummy variable trap - all observations will satisfy one or the other category. To draw relevant insights from the regression, we need to exclude one category from the regression. If we had these dummy variables coded into a factor, we can have R exclude any particular category by changing the order in which the categories are included in the factor. Similarly, if both dummy variables are included in the regression, we can make sure R excludes the relevant dummy by changing their order.
 
+We don't apply polynomials or logs to the dummy variables as they will not have any effect on the regression. $1^x = 1$; $0^x = 0$.
+
+**Are your other dummy variables in the regression working sensibly with your selection criteria?**
+
+Here are some predicted values for each of the three regression models that we have created.
 ```{r}
-# Adding educ_hs in our particular subset will render it as omitted (we haven't included it as a variable in the subset). If we add the educ_advdeg variable, it will also be rendered as omitted, so R can run a comparison.
-lmedu <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college + educ_advdeg))
-lmedu
-lmedua <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_advdeg + educ_college))
-lmedua
-# if we change the position of the educ_advdeg variable to place it BEFORE the educ_college variable, R drops the LAST variable from the regression. What is interesting is that whichever variable is included, the coefficient is the absolute same value but has a negative value when educ_college is the included variable.
+display <- filter(comptable, (AGE >=57 & AGE <=61 | AGE >=30 & AGE <=34))
+display
 ```
-Why don't we use polynomial terms of dummy variables? Experiment.
-
-```{r}
-# We don't use polynomials of dummy variables as they have no effect on the regression - 1^x = 1; 0^x = 0.
-```
-What is the predicted wage, from your model, for a few relevant cases? Do those seem reasonable?
+The predicted values demonstrate the upward trend of wages towards the late 50s of those working in the medical field. The predicted values seem to make sense. Younger professionals earn less than their more experienced counterparts. The gap between more experience physicians and their contemporaries working in other hospitals jobs, such as janitors or caterers, would be greater. Glied, Ma and Pearlsteins' 2015 [article](https://www.healthaffairs.org/doi/full/10.1377/hlthaff.2014.1367) has a succinct depiction of the differences between Physicians, Nurses and other health industry workers in the first results table. Their data comes from the 2014 CPS data and is reported in 2013 dollars.
 ```{r eval=FALSE}
 # check wage as a function of age for lma and medpredict
 # we can also change the medpredict objects to use the poly regression or the log regression
@@ -163,6 +164,22 @@ comptable
 ```
 
 What is difference in regression from using log wage as the dependent variable? Compare the pattern of predicted values from the two models (remember to take exp() of the predicted value, where the dependent is log wage). Discuss.
+
+By changing the dependent variable to log(INCWAGE), we encountered an error as there are 45 observations in the dataset that have INCWAGE = 0. To get around this issue, we asked the regression to take $log(INCWAGE + 1)$ to remove the issues of the 0 values whilst minimizing the impact on the other observations. The observed values are generally big enough that the addition of 1 does not impact the log of the observations with any significance.
+```{r include=FALSE}
+lmlogb <- lm(log(INCWAGE + 1) ~ AGE + log(AGE) + educ_college)
+png(filename="~/CCNY/Econometrics/Homework/Draft Hwk Files/Homework-5/Hwk-5/logfunlogplot.png")
+plot(log(INCWAGE + 1) ~ jitter(AGE, factor = 2), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.1), ylim = c(0,20), data = med_graph)
+medpredictb$yhatlogfun <- predict(lmlogb, newdata = medpredictb)
+lines(yhatlogfun ~ AGE, data = medpredictb, col = "Orange")
+legend("topleft", "Logs of logs", col = "Orange", lty = 1, bty = "n")
+dev.off()
+```
+Here we compare INCWAGE ~ log(AGE) and log(INCWAGE + 1) ~ log(AGE)
+
+![log plot](./solologplot.png) ![log of log plot](./logfunlogplot.png)
+
+
 
 ```{r}
 # included all 3 regressions into medpredict in prior chunks to allow for easy comparison in the table
@@ -185,3 +202,5 @@ What are the other variables you are using in your regression? Do they have the 
 
 ### Bibliography
 https://cps.ipums.org/cps-action/variables/INCWAGE#description_section
+
+Glied, Sherry A., Ma, Stephanie  and Pearlstein, Ivanna, (2015). "Understanding Pay Differentials Among Health Professionals, Nonprofessionals, And Their Counterparts In Other Sectors" https://www.healthaffairs.org/doi/full/10.1377/hlthaff.2014.1367

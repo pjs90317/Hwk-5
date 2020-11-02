@@ -71,9 +71,7 @@ prediction model to predict wages for those with advanced degrees.
 ![initial regression plot](./initlmplot.png)
 
 The plot for the predicted values shows us a gently sloped concave curve
-that has a peak predicted value of
-
-    ## [1] 119489.4
+that has a peak predicted value of 119489.4.
 
 When we added high polynomials, \(Age^3\), \(Age^4\) and \(Age^5\), to
 the regression, the absolute values of the corresponding coefficients
@@ -119,13 +117,10 @@ get progressively smaller.
 
 When plotted, the curves follow a similar slope and shape. Adding the
 extra polynomials increases the maximum predicted wage slightly to
-
-    ## [1] 120590.2
-
-but we notice a steepening of the “Polynomials” curve as age approaches
-70. Running a joint hypothesis shows us that the higher-order polynomial
-terms are not significant; i.e. they have next to relationship with how
-wages are determined within the dataset.
+120590.2 but we notice a steepening of the “Polynomials” curve as age
+approaches 70. Running a joint hypothesis shows us that the higher-order
+polynomial terms are not significant; i.e. they have next to
+relationship with how wages are determined within the dataset.
 
     ## Linear hypothesis test
     ## 
@@ -142,100 +137,136 @@ wages are determined within the dataset.
 In both regression, wages as a function of age trend upwards. Wage peaks
 at the age of 55 in the initial regression model but peaks later, at 59,
 in the polynomial model. The range of predicted wages is larger in the
-polynomial model by 4549.3295301
+polynomial model by 4549.33
 
-What if you used \(log(Age)\)? (And why would polynomials in
-\(log(Age)\) be useless? Experiment.)
+If we use \(log(Age)\) in our regression instead, we can clearly see
+that the log function flattens the predicted values towards the upper
+end of our age range.  
+![log regression plot](./logplot.png)  
+The log function demonstrates that the percentage changes in wage
+relative to the increase in age are small compared to wage changes for
+younger workers. The log regression curve also shows us the impact of
+outliers on the higher-order polynomials regression.
 
-![](Hwk5Draftb_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+**Dummy Variables**  
+Were we to add the *educ\_hs* dummy variable into this regression it
+would have zero effect because our dataset only includes those with a
+Bachelor or Advanced degree. However, if we add both the *educ\_college*
+and *educ\_advdeg*, we fall into the dummy variable trap - all
+observations will satisfy one or the other category. To draw relevant
+insights from the regression, we need to exclude one category from the
+regression. If we had these dummy variables coded into a factor, we can
+have R exclude any particular category by changing the order in which
+the categories are included in the factor. Similarly, if both dummy
+variables are included in the regression, we can make sure R excludes
+the relevant dummy by changing their order.
 
-    ## [1] 83344.81
+We don’t apply polynomials or logs to the dummy variables as they will
+not have any effect on the regression. \(1^x = 1\); \(0^x = 0\).
 
-Recall about how dummy variables work. If you added educ\_hs in a
-regression using the subset given above, what would that do?
-(Experiment, if you aren’t sure.) What is interpretation of coefficient
-on *educ\_college* in that subset? What would happen if you put both
-*educ\_college* and *educ\_advdeg* into a regression? Are your other
-dummy variables in the regression working sensibly with your selection
-criteria?
+**Are your other dummy variables in the regression working sensibly with
+your selection criteria?**
 
-    ## 
-    ## Call:
-    ## lm(formula = (INCWAGE ~ AGE + I(AGE^2) + educ_college + educ_advdeg))
-    ## 
-    ## Coefficients:
-    ##  (Intercept)           AGE      I(AGE^2)  educ_college   educ_advdeg  
-    ##    -22289.85       5121.62        -46.25     -35171.72            NA
+Here are some predicted values for each of the three regression models
+that we have created.
 
-    ## 
-    ## Call:
-    ## lm(formula = (INCWAGE ~ AGE + I(AGE^2) + educ_advdeg + educ_college))
-    ## 
-    ## Coefficients:
-    ##  (Intercept)           AGE      I(AGE^2)   educ_advdeg  educ_college  
-    ##    -57461.57       5121.62        -46.25      35171.72            NA
+    ##    AGE      yhat yhatpolys   yhatlog
+    ## 1   30  89732.67  90835.37  90170.61
+    ## 2   31  92032.97  93491.93  92776.40
+    ## 3   32  94240.76  95905.31  95201.80
+    ## 4   33  96356.05  98091.90  97457.92
+    ## 5   34  98378.84 100068.70  99554.87
+    ## 6   57 119372.33 120234.18 118342.81
+    ## 7   58 119175.06 120485.35 118280.71
+    ## 8   59 118885.29 120590.21 118167.10
+    ## 9   60 118503.02 120514.80 118003.71
+    ## 10  61 118028.24 120220.65 117792.18
 
-Why don’t we use polynomial terms of dummy variables? Experiment.
-
-What is the predicted wage, from your model, for a few relevant cases?
-Do those seem reasonable?
+The predicted values demonstrate the upward trend of wages towards the
+late 50s of those working in the medical field. The predicted values
+seem to make sense. Younger professionals earn less than their more
+experienced counterparts. The gap between more experience physicians and
+their contemporaries working in other hospitals jobs, such as janitors
+or caterers, would be greater. Glied, Ma and Pearlsteins’ 2015
+[article](https://www.healthaffairs.org/doi/full/10.1377/hlthaff.2014.1367)
+has a succinct depiction of the differences between Physicians, Nurses
+and other health industry workers in the first results table. Their data
+comes from the 2014 CPS data and is reported in 2013 dollars.
 
 What is difference in regression from using log wage as the dependent
 variable? Compare the pattern of predicted values from the two models
 (remember to take exp() of the predicted value, where the dependent is
 log wage). Discuss.
 
-    ##    AGE female educ_college educ_advdeg  yhatlog
-    ## 1   25      1            1           1 38951.67
-    ## 2   26      1            1           1 42671.68
-    ## 3   27      1            1           1 46135.20
-    ## 4   28      1            1           1 49360.89
-    ## 5   29      1            1           1 52365.44
-    ## 6   30      1            1           1 55163.84
-    ## 7   31      1            1           1 57769.63
-    ## 8   32      1            1           1 60195.04
-    ## 9   33      1            1           1 62451.16
-    ## 10  34      1            1           1 64548.10
-    ## 11  35      1            1           1 66495.10
-    ## 12  36      1            1           1 68300.61
-    ## 13  37      1            1           1 69972.37
-    ## 14  38      1            1           1 71517.53
-    ## 15  39      1            1           1 72942.66
-    ## 16  40      1            1           1 74253.84
-    ## 17  41      1            1           1 75456.70
-    ## 18  42      1            1           1 76556.46
-    ## 19  43      1            1           1 77557.96
-    ## 20  44      1            1           1 78465.74
-    ## 21  45      1            1           1 79284.00
-    ## 22  46      1            1           1 80016.68
-    ## 23  47      1            1           1 80667.46
-    ## 24  48      1            1           1 81239.78
-    ## 25  49      1            1           1 81736.89
-    ## 26  50      1            1           1 82161.82
-    ## 27  51      1            1           1 82517.44
-    ## 28  52      1            1           1 82806.42
-    ## 29  53      1            1           1 83031.32
-    ## 30  54      1            1           1 83194.53
-    ## 31  55      1            1           1 83298.31
-    ## 32  56      1            1           1 83344.81
-    ## 33  57      1            1           1 83336.04
-    ## 34  58      1            1           1 83273.95
-    ## 35  59      1            1           1 83160.33
-    ## 36  60      1            1           1 82996.94
-    ## 37  61      1            1           1 82785.42
-    ## 38  62      1            1           1 82527.32
-    ## 39  63      1            1           1 82224.15
-    ## 40  64      1            1           1 81877.31
-    ## 41  65      1            1           1 81488.17
-    ## 42  66      1            1           1 81058.02
-    ## 43  67      1            1           1 80588.09
-    ## 44  68      1            1           1 80079.56
-    ## 45  69      1            1           1 79533.55
-    ## 46  70      1            1           1 78951.15
+By changing the dependent variable to log(INCWAGE), we encountered an
+error as there are 45 observations in the dataset that have INCWAGE = 0.
+To get around this issue, we asked the regression to take
+\(log(INCWAGE + 1)\) to remove the issues of the 0 values whilst
+minimizing the impact on the other observations. The observed values are
+generally big enough that the addition of 1 does not impact the log of
+the observations with any significance.
 
-    ## [1] 73658.94
+Here we compare INCWAGE \~ log(AGE) and log(INCWAGE + 1) \~ log(AGE)
 
-    ## [1] 73658.94
+![log plot](./solologplot.png) ![log of log plot](./logfunlogplot.png)
+
+    ##    AGE female educ_college educ_advdeg
+    ## 1   25      1            1           1
+    ## 2   26      1            1           1
+    ## 3   27      1            1           1
+    ## 4   28      1            1           1
+    ## 5   29      1            1           1
+    ## 6   30      1            1           1
+    ## 7   31      1            1           1
+    ## 8   32      1            1           1
+    ## 9   33      1            1           1
+    ## 10  34      1            1           1
+    ## 11  35      1            1           1
+    ## 12  36      1            1           1
+    ## 13  37      1            1           1
+    ## 14  38      1            1           1
+    ## 15  39      1            1           1
+    ## 16  40      1            1           1
+    ## 17  41      1            1           1
+    ## 18  42      1            1           1
+    ## 19  43      1            1           1
+    ## 20  44      1            1           1
+    ## 21  45      1            1           1
+    ## 22  46      1            1           1
+    ## 23  47      1            1           1
+    ## 24  48      1            1           1
+    ## 25  49      1            1           1
+    ## 26  50      1            1           1
+    ## 27  51      1            1           1
+    ## 28  52      1            1           1
+    ## 29  53      1            1           1
+    ## 30  54      1            1           1
+    ## 31  55      1            1           1
+    ## 32  56      1            1           1
+    ## 33  57      1            1           1
+    ## 34  58      1            1           1
+    ## 35  59      1            1           1
+    ## 36  60      1            1           1
+    ## 37  61      1            1           1
+    ## 38  62      1            1           1
+    ## 39  63      1            1           1
+    ## 40  64      1            1           1
+    ## 41  65      1            1           1
+    ## 42  66      1            1           1
+    ## 43  67      1            1           1
+    ## 44  68      1            1           1
+    ## 45  69      1            1           1
+    ## 46  70      1            1           1
+
+    ## Warning in mean.default(medpredict$yhat): argument is not numeric or logical:
+    ## returning NA
+
+    ## [1] NA
+
+    ## Warning in mean.default(medpredict$yhatlog): argument is not numeric or logical:
+    ## returning NA
+
+    ## [1] NA
 
 Try some interactions, like this,
 
@@ -276,3 +307,8 @@ predicted values, and providing any relevant graphics. Impress.
 ### Bibliography
 
 <https://cps.ipums.org/cps-action/variables/INCWAGE#description_section>
+
+Glied, Sherry A., Ma, Stephanie and Pearlstein, Ivanna, (2015).
+“Understanding Pay Differentials Among Health Professionals,
+Nonprofessionals, And Their Counterparts In Other Sectors”
+<https://www.healthaffairs.org/doi/full/10.1377/hlthaff.2014.1367>
