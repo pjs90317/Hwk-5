@@ -48,15 +48,14 @@ income’ each of the respondent’s earned as an employee in the previous
 The regressor coefficients from the initial regression all appear to be
 statistically significant, the only exception being the intercept
 coefficient. What is curious is that holding a Bachelor’s degree has a
-*negative* correlation with wages within the subset, as does \(Age^2\).
-However, for our observations this makes sense; we limited our
-observations to people who hold Bachelor’s or Advanced degrees. From an
-outsider’s perspective of the industry, those whole hold advanced
-degrees or extra certifications within the medical field would be those
-who have specialized in particular fields, commanding higher wages for
-their specialized knowledge. A Bachelor’s degree is closer to an entry
-level requirement in the field, so the comparative wages are
-significantly lower.
+*negative* correlation with wages within the subset. However, for our
+observations this makes sense; we limited our observations to people who
+hold Bachelor’s or Advanced degrees. From an outsider’s perspective of
+the industry, those who hold advanced degrees or extra certifications
+within the medical field would be those who have specialized in
+particular fields, commanding higher wages for their specialized
+knowledge. A Bachelor’s degree is closer to an entry level requirement
+in the field, so the comparative wages are significantly lower.
 
 From this regression, we created our prediction model using 50% of the
 2626 observations in our subset in order to give the model a sizable
@@ -119,7 +118,7 @@ When plotted, the curves follow a similar slope and shape. Adding the
 extra polynomials increases the maximum predicted wage slightly to
 120590.2 but we notice a steepening of the “Polynomials” curve as age
 approaches 70. Running a joint hypothesis shows us that the higher-order
-polynomial terms are not significant; i.e. they have next to
+polynomial terms are not significant; i.e. they have next to no
 relationship with how wages are determined within the dataset.
 
     ## Linear hypothesis test
@@ -224,7 +223,7 @@ in wages.
 **Interactions**  
 For our interactions, we add a factor based on the times workers leave
 their homes to get to work. The factor is split into 4 time periods,
-Morn, Mid, Grave, Night, corresponding to (5am-9:30am), (9:31am-5:00pm),
+Night, Morn, Mid, Grave, corresponding to (5am-9:30am), (9:31am-5:00pm),
 (5:01pm-11:59pm) and (12:00-4:59am) respectively.
 
 We chose departure time because we believe the time someone leaves for
@@ -233,14 +232,17 @@ the assumption that most people prefer to work during daytime hours.
 Research has shown that human biology follows a [circadian
 rhythm](https://www.sleepfoundation.org/circadian-rhythm#:~:text=The%20sleep%2Dwake%20cycle%20is,keep%20us%20awake%20and%20active)
 to allow the brain and body to be awake and alert during the sunny hours
-and rest at nighttime. It is hard to purposefully adjust circadian
-rhythms so we can be more alert during nighttime hours *(insert research
-link here)*. Therefore, we expect that those who have departure times
+and rest at nighttime. We expect that those who have departure times
 during the day time would have higher incomes than those who have “less
 desirable” departure times, such as a graveyard shift at a hospital.
 
-**Are your other dummy variables in the regression working sensibly with
-your selection criteria?**
+0.81 of observations in the dataset depart for work between 5am and 9am.
+We assume that these healthcare workers comprise of practitioners and
+managerial or administrative personnel. It is the commute time for the
+most desirable and most common working hours. We expect graveyard shift
+workers to have the next highest predicted wages, as they receive the
+pay differential for working odd hours. Lastly, we expect to see Mid and
+Night departure times with the lowest level of predicted wages.
 
     ## 
     ## Call:
@@ -254,19 +256,19 @@ your selection criteria?**
     ## 
     ## Coefficients:
     ##                            Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)               -25859.72   21598.79  -1.197   0.2313    
-    ## AGE                         5369.32     992.19   5.412 6.81e-08 ***
+    ## (Intercept)                -3232.52   30612.27  -0.106   0.9159    
+    ## AGE                         4775.47    1054.78   4.527 6.24e-06 ***
     ## I(AGE^2)                     -48.40      10.84  -4.465 8.35e-06 ***
-    ## deptimeMid                -35954.03   21526.14  -1.670   0.0950 .  
-    ## deptimeGrave              -12252.80   28910.39  -0.424   0.6717    
-    ## deptimeNight               22627.20   24160.88   0.937   0.3491    
-    ## educ_college              -38997.79    3205.88 -12.164  < 2e-16 ***
-    ## AGE:deptimeMid               241.78     442.60   0.546   0.5849    
-    ## AGE:deptimeGrave            -171.82     582.60  -0.295   0.7681    
-    ## AGE:deptimeNight            -593.86     463.27  -1.282   0.2000    
-    ## deptimeMid:educ_college    21894.38   10876.21   2.013   0.0442 *  
-    ## deptimeGrave:educ_college  15521.92   13915.71   1.115   0.2648    
-    ## deptimeNight:educ_college  17294.45   13870.83   1.247   0.2126    
+    ## deptimeMorn               -22627.20   24160.88  -0.937   0.3491    
+    ## deptimeMid                -58581.23   31158.26  -1.880   0.0602 .  
+    ## deptimeGrave              -34880.00   36677.15  -0.951   0.3417    
+    ## educ_college              -21703.35   13500.31  -1.608   0.1080    
+    ## AGE:deptimeMorn              593.86     463.27   1.282   0.2000    
+    ## AGE:deptimeMid               835.64     613.97   1.361   0.1736    
+    ## AGE:deptimeGrave             422.03     722.38   0.584   0.5591    
+    ## deptimeMorn:educ_college  -17294.45   13870.83  -1.247   0.2126    
+    ## deptimeMid:educ_college     4599.94   17033.89   0.270   0.7871    
+    ## deptimeGrave:educ_college  -1772.52   19123.19  -0.093   0.9262    
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -274,67 +276,155 @@ your selection criteria?**
     ## Multiple R-squared:  0.08886,    Adjusted R-squared:  0.08468 
     ## F-statistic: 21.24 on 12 and 2613 DF,  p-value: < 2.2e-16
 
+Including the deptime factor produces outputs that appear to have no
+bearing on determining predicted wages. We may have included too many
+interactions, reducing the sizes of the subsets within the regression.
+Here is a plot with regression lines for the interactions and one
+regression without interactions.  
+![Interaction Plot](./interactionsplot.png)  
+The three curves have different peaks 100796.3, 123028.2, 108024.7 for
+Mid Departure, Morn Departure and no interactions respectively.
+
+### Our Regression Model: Departure Time and Health Insurance
+
+The interactions regression suggested that the departure times of
+healthcare workers have no significant relationship with their wages.
+However, we may have built in too many interactions for our dataset.
+Here, we remove the interactions and focus on a simpler regression.
+
+We also include health insurance. As health insurance is usually a
+benefit for many well paid jobs, we are expecting to see that people
+with health insurance have higher wages. The proportion of healthcare
+workers in the subset with health insurance is \~97.94%. We may not see
+a large enough difference between the two groups for it to be
+statistically significant. Let’s see what the regression tells us.
+
     ## 
-    ## =====================================================
-    ##                               Dependent variable:    
-    ##                           ---------------------------
-    ##                                     INCWAGE          
-    ## -----------------------------------------------------
-    ## AGE                              5,369.325***        
-    ##                                    (992.194)         
-    ##                                                      
-    ## I(AGE2)                           -48.405***         
-    ##                                    (10.841)          
-    ##                                                      
-    ## deptimeMid                       -35,954.030*        
-    ##                                  (21,526.140)        
-    ##                                                      
-    ## deptimeGrave                      -12,252.800        
-    ##                                  (28,910.390)        
-    ##                                                      
-    ## deptimeNight                      22,627.200         
-    ##                                  (24,160.880)        
-    ##                                                      
-    ## educ_college                    -38,997.790***       
-    ##                                   (3,205.877)        
-    ##                                                      
-    ## AGE:deptimeMid                      241.784          
-    ##                                    (442.596)         
-    ##                                                      
-    ## AGE:deptimeGrave                   -171.822          
-    ##                                    (582.602)         
-    ##                                                      
-    ## AGE:deptimeNight                   -593.855          
-    ##                                    (463.267)         
-    ##                                                      
-    ## deptimeMid:educ_college          21,894.380**        
-    ##                                  (10,876.210)        
-    ##                                                      
-    ## deptimeGrave:educ_college         15,521.920         
-    ##                                  (13,915.710)        
-    ##                                                      
-    ## deptimeNight:educ_college         17,294.440         
-    ##                                  (13,870.830)        
-    ##                                                      
-    ## Constant                          -25,859.720        
-    ##                                  (21,598.790)        
-    ##                                                      
-    ## -----------------------------------------------------
-    ## Observations                         2,626           
-    ## R2                                   0.089           
-    ## Adjusted R2                          0.085           
-    ## Residual Std. Error         73,769.790 (df = 2613)   
-    ## F Statistic                21.237*** (df = 12; 2613) 
-    ## =====================================================
-    ## Note:                     *p<0.1; **p<0.05; ***p<0.01
+    ## Call:
+    ## lm(formula = (INCWAGE ~ AGE + I(AGE^2) + educ_college + deptime + 
+    ##     HCOVANY), data = dat_med)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -120895  -35298  -10369   16767  573983 
+    ## 
+    ## Coefficients:
+    ##               Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)  -31143.28   30117.69  -1.034  0.30121    
+    ## AGE            5254.29     986.45   5.326 1.09e-07 ***
+    ## I(AGE^2)        -47.62      10.81  -4.403 1.11e-05 ***
+    ## educ_college -35566.01    2919.48 -12.182  < 2e-16 ***
+    ## deptimeMorn   -9679.43    5862.47  -1.651  0.09884 .  
+    ## deptimeMid   -22401.30    7620.05  -2.940  0.00331 ** 
+    ## deptimeGrave -21162.22    8796.31  -2.406  0.01621 *  
+    ## HCOVANY        8402.90   10177.42   0.826  0.40908    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 73810 on 2618 degrees of freedom
+    ## Multiple R-squared:  0.08611,    Adjusted R-squared:  0.08367 
+    ## F-statistic: 35.24 on 7 and 2618 DF,  p-value: < 2.2e-16
 
-and explain those outputs (different peaks for different groups).
+The results seem to indicate that health insurance is not statistically
+significant. The high p-value of \~0.40908 suggests a relationship does
+not exist between health insurance and wages. This seems to confirm what
+we had suspected when looking at the proportion of observations with
+health insurance.
 
-What are the other variables you are using in your regression? Do they
-have the expected signs and patterns of significance? Explain if there
-is a plausible causal link from X variables to Y and not the reverse.
-Explain your results, giving details about the estimation, some
-predicted values, and providing any relevant graphics. Impress.
+Here is a regression isolating the health insurance variable to see how
+the p-value changes.
+
+The health insurance variable by itself still shows a high p-value of
+\~0.19885. We would fail to reject the null hypothesis that “no
+relationship exists between health insurance and wages.” The variable
+HCOVANY would not be useful in helping us predict wages. We will not
+include it in our regression model. Instead, we focus on departure time.
+
+For departure time, we would expect that those departing during the
+morning hours (5am-9am) would earn the most as most of these roles are
+administrative and managerial, followed by the healthcare workers who
+work the graveyard shift due to the pay differential. And lastly,
+daytime and evening commuters would have wages slightly less.
+
+    ## 
+    ## Call:
+    ## lm(formula = (INCWAGE ~ AGE + I(AGE^2) + educ_college + deptime), 
+    ##     data = dat_med)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -120804  -35204  -10321   16892  574221 
+    ## 
+    ## Coefficients:
+    ##               Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)  -14079.71   21906.40  -0.643  0.52046    
+    ## AGE            5236.23     986.15   5.310 1.19e-07 ***
+    ## I(AGE^2)        -47.38      10.81  -4.383 1.22e-05 ***
+    ## educ_college -35638.10    2917.99 -12.213  < 2e-16 ***
+    ## deptimeMorn   -9765.31    5861.19  -1.666  0.09581 .  
+    ## deptimeMid   -22567.52    7616.93  -2.963  0.00308 ** 
+    ## deptimeGrave -21508.33    8785.78  -2.448  0.01443 *  
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 73810 on 2619 degrees of freedom
+    ## Multiple R-squared:  0.08587,    Adjusted R-squared:  0.08378 
+    ## F-statistic:    41 on 6 and 2619 DF,  p-value: < 2.2e-16
+
+Running this regression model with the departure time shows p-values of
+\~0.09 for both Night and Morning departure times. We would fail to
+reject the null hypothesis at the 5% level of significance, perhaps
+saying that there is no relationship between Night and Morning departure
+times and wages. The “mid” (9:31am - 5pm) departure time appears to show
+that there is a relationship between leaving for work in the middle of
+the day and a healthcare worker’s wages.
+
+We note that R has dropped a dummy variable from our factor, namely the
+Graveyard departure time. To fix this, we will reorder the factor to
+drop off either the Night or Morning shift instead, as we determined
+both of these were not statistically significant at the 5% level of
+significance.
+
+After adjusting our factors for departure time, we can see that
+Graveyard and Midday are still statistically significant with p-values
+less than 0.05.
+
+![Deptime Plots](./deptimeplot.png)  
+Based on our plotted regression line, the Graveyard commute gets paid
+slightly more than the Mid commute healthcare workers. The difference
+does not seem to be very large. Looking at the peak wages of 73446 for
+Graveyard departure times and 72387 for Mid departure times, this is
+only a 1.46% difference in peak predicted wages. The difference in
+estimated coefficients from the regression output above match what the
+peak predicted values indicate; the difference between is the change in
+y-intercept, not the slope of the curve.
+
+We would predict slightly higher wages for those workers who have a
+Graveyard commute than those with a Midday commute. This did not match
+our expectations; we thought workers with a Morning commute would have
+the highest predicted wages but this variable ended up being not
+statistically significant.
+
+In terms of considering this correlation to be a casual link, we would
+have to look into deeper why the Morning and Night commutes are
+non-significant at the 5% level. We need to make sure that the variation
+of departure time and wages change together. The inclusion of the health
+insurance variable demonstrated that the relationship between the
+independent and dependent variables was not definitively X to Y -
+rather, it is more likely the case that many of the observations had
+health insurance because a) they work in the field and b) they are well
+paid and can afford to purchase insurance.
+
+It’s evident that each regression model, be it with polynomials, logs or
+interactions, suits different purposes and highlights different
+information. We quickly ascertained from the interaction regression that
+perhaps less is more (or perhaps keener insight into the impact of
+interactions on a dataset of the size we have) and while it gave us a
+broad insight into the effect of departure time, we were able to parse
+out clearer information when we reverted to a more basic regression.
+Understanding the context of the data and having a clear idea of how the
+variables will interact with each other are important skills necessary
+to effectively utilize these models.
 
 ### Bibliography
 
@@ -342,9 +432,8 @@ predicted values, and providing any relevant graphics. Impress.
 
 Glied, Sherry A., Ma, Stephanie and Pearlstein, Ivanna, (2015).
 “Understanding Pay Differentials Among Health Professionals,
-Nonprofessionals, And Their Counterparts In Other Sectors”
+Nonprofessionals, And Their Counterparts In Other Sectors”,
 <https://www.healthaffairs.org/doi/full/10.1377/hlthaff.2014.1367>
 
-Our Regression Model: Departure Time and Health Insurance
-
-Our Regression Model: Departure Time and Health Insurance
+Suni, Eric., (2020) “Circadian Rhythm”,
+<https://www.sleepfoundation.org/circadian-rhythm#>:\~:text=The%20sleep%2Dwake%20cycle%20is,keep%20us%20awake%20and%20active

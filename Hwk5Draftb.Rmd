@@ -28,7 +28,7 @@ graveyard <- ((DEPARTS >= 0) & (DEPARTS <= 459))
 morning <- ((DEPARTS >= 500) & (DEPARTS <=930))
 daytime <- ((DEPARTS >= 931) & (DEPARTS <=1700))
 evening <- ((DEPARTS >= 1701) & (DEPARTS <=2359))
-deptime <- factor((1*morning + 2*daytime + 3*graveyard + 4*evening), levels = c(1, 2, 3, 4), labels = c("Morn", "Mid",  "Grave", "Night"))
+deptime <- factor((1*evening + 2*morning + 3*daytime + 4*graveyard), levels = c(1, 2, 3, 4), labels = c("Night", "Morn", "Mid",  "Grave"))
 detach()
 ```
 For our initial regression, we elected to use the [INCWAGE](https://cps.ipums.org/cps-action/variables/INCWAGE#description_section) observations as our measure of wage. We made this decision as we believe it is reasonable to assume that most of the data observations in our subset (females in the medical field with a Bachelor or Advanced degree) would only hold one job. INCWAGE is 'the total pre-tax and salary income' each of the respondent's earned as an employee in the previous 12 months prior to the survey.
@@ -39,7 +39,7 @@ lma <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college))
 suppressWarnings(stargazer(lma, type = "text"))
 detach()
 ```
-The regressor coefficients from the initial regression all appear to be statistically significant, the only exception being the intercept coefficient. What is curious is that holding a Bachelor's degree has a *negative* correlation with wages within the subset, as does $Age^2$. However, for our observations this makes sense; we limited our observations to people who hold Bachelor's or Advanced degrees. From an outsider's perspective of the industry, those whole hold advanced degrees or extra certifications within the medical field would be those who have specialized in particular fields, commanding higher wages for their specialized knowledge. A Bachelor's degree is closer to an entry level requirement in the field, so the comparative wages are significantly lower.
+The regressor coefficients from the initial regression all appear to be statistically significant, the only exception being the intercept coefficient. What is curious is that holding a Bachelor's degree has a *negative* correlation with wages within the subset. However, for our observations this makes sense; we limited our observations to people who hold Bachelor's or Advanced degrees. From an outsider's perspective of the industry, those who hold advanced degrees or extra certifications within the medical field would be those who have specialized in particular fields, commanding higher wages for their specialized knowledge. A Bachelor's degree is closer to an entry level requirement in the field, so the comparative wages are significantly lower.
 
 From this regression, we created our prediction model using 50% of the 2626 observations in our subset in order to give the model a sizable enough sample from which to draw its comparisons. For easy visualization, the jitter has been set to 0.1, to demonstrate the trends at different ages and the range of the INCWAGE axis has been capped at 300,000.
 
@@ -53,13 +53,11 @@ med_graph <-subset(dat_med, graph_obs)
 detach()
 ```
 ```{r include=FALSE}
-png(filename="./initlmplot.png")
 plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
 medpredict <- data.frame(AGE = 25:70, female = 1, educ_college = 1, educ_advdeg = 1)
 medpredictb <- data.frame(AGE = 25:70, female = 1, educ_college = 0, educ_advdeg = 1)
 medpredictb$yhat <- predict(lma, newdata = medpredictb)
 lines(yhat ~ AGE, data = medpredictb)
-dev.off()
 initmax <- max(medpredictb$yhat)
 ```
 ![Initial Regression Plot](./initlmplot.png)
@@ -84,7 +82,7 @@ polymax <- max(medpredictb$yhatpolys)
 ```
 ![Polynomial Regression](./polyplot.png)
 
-When plotted, the curves follow a similar slope and shape. Adding the extra polynomials increases the maximum predicted wage slightly to `r format(round(polymax, digits = 2), scientific=FALSE)` but we notice a steepening of the "Polynomials" curve as age approaches 70. Running a joint hypothesis shows us that the higher-order polynomial terms are not significant; i.e. they have next to relationship with how wages are determined within the dataset.
+When plotted, the curves follow a similar slope and shape. Adding the extra polynomials increases the maximum predicted wage slightly to `r format(round(polymax, digits = 2), scientific=FALSE)` but we notice a steepening of the "Polynomials" curve as age approaches 70. Running a joint hypothesis shows us that the higher-order polynomial terms are not significant; i.e. they have next to no relationship with how wages are determined within the dataset.
 
 ```{r incldue=FALSE}
 polyrange <- sum(max(medpredictb$yhatpolys)-min(medpredictb$yhatpolys))
@@ -152,137 +150,93 @@ Changing our dependent variable to log(INCWAGE + 1) depicts the percentage chang
 **Interactions**  
 For our interactions, we add a factor based on the times workers leave their homes to get to work. The factor is split into 4 time periods, `r levels(deptime)`, corresponding to (5am-9:30am), (9:31am-5:00pm), (5:01pm-11:59pm) and (12:00-4:59am) respectively.  
 
-We chose departure time because we believe the time someone leaves for work would be a strong indicator of how much they make in wages. We take the assumption that most people prefer to work during daytime hours. Research has shown that human biology follows a [circadian rhythm](https://www.sleepfoundation.org/circadian-rhythm#:~:text=The%20sleep%2Dwake%20cycle%20is,keep%20us%20awake%20and%20active) to allow the brain and body to be awake and alert during the sunny hours and rest at nighttime. It is hard to purposefully adjust circadian rhythms so we can be more alert during nighttime hours *(insert research link here)*. Therefore, we expect that those who have departure times during the day time would have higher incomes than those who have "less desirable" departure times, such as a graveyard shift at a hospital.
+We chose departure time because we believe the time someone leaves for work would be a strong indicator of how much they make in wages. We take the assumption that most people prefer to work during daytime hours. Research has shown that human biology follows a [circadian rhythm](https://www.sleepfoundation.org/circadian-rhythm#:~:text=The%20sleep%2Dwake%20cycle%20is,keep%20us%20awake%20and%20active) to allow the brain and body to be awake and alert during the sunny hours and rest at nighttime. We expect that those who have departure times during the day time would have higher incomes than those who have "less desirable" departure times, such as a graveyard shift at a hospital.
 
-**Are your other dummy variables in the regression working sensibly with your selection criteria?**  
+```{r include=FALSE}
+dtab <- table(deptime)
+dtab
+depprop <- (sum(morning==1))/(sum(dtab))
+```
+`r round(depprop, digits=2)` of observations in the dataset depart for work between 5am and 9am. We assume that these healthcare workers comprise of practitioners and managerial or administrative personnel. It is the commute time for the most desirable and most common working hours. We expect graveyard shift workers to have the next highest predicted wages, as they receive the pay differential for working odd hours. Lastly, we expect to see Mid and Night departure times with the lowest level of predicted wages.
+
 ```{r}
 lminter <- lm(INCWAGE ~ AGE + I(AGE^2) + deptime + educ_college + (deptime*AGE) + (deptime*(AGE^2)) + (deptime*educ_college), data=dat_med)
 summary(lminter)
-suppressWarnings(stargazer(lminter, type = "text"))
 ```
-and explain those outputs (different peaks for different groups).
+```{r include=FALSE}
+lmDepHealth2 <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college + deptime), data=dat_med)
+plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
+medpredict1 <- data.frame(AGE = 25:70, female = 1, educ_college = 0, deptime = "Mid")
+medpredict1$yhatnoint <- predict(lmDepHealth2, newdata = medpredict1)
+medpredict1$yhat <- predict(lminter, newdata = medpredict1)
+medpredict2 <- data.frame(AGE = 25:70, female = 1, educ_college = 0, deptime = "Morn")
+medpredict2$yhat <- predict(lminter, newdata = medpredict2)
+lines(yhat ~ AGE, data = medpredict1, col = "Black")
+lines(yhat ~ AGE, data = medpredict2, col = "Red")
+lines(yhatnoint ~ AGE, data = medpredict1, col = "Blue")
+legend("topleft", c("Mid", "Morn", "No Inter"), lty=1, col = c("Black", "Red", "Blue"), bty="n")
+peakvalues <- c(max(medpredict1$yhat), max(medpredict2$yhat), max(medpredict1$yhatnoint))
+peakvalues
+```
+Including the deptime factor produces outputs that appear to have no bearing on determining predicted wages. We may have included too many interactions, reducing the sizes of the subsets within the regression. Here is a plot with regression lines for the interactions and one regression without interactions.  
+![Interaction Plot](./interactionsplot.png)  
+The three curves have different peaks `r format(peakvalues, scientific=FALSE)` for Mid Departure, Morn Departure and no interactions respectively.
 
-What are the other variables you are using in your regression? Do they have the expected signs and patterns of significance? Explain if there is a plausible causal link from X variables to Y and not the reverse. Explain your results, giving details about the estimation, some predicted values, and providing any relevant graphics. Impress.
+### Our Regression Model: Departure Time and Health Insurance  
+The interactions regression suggested that the departure times of healthcare workers have no significant relationship with their wages. However, we may have built in too many interactions for our dataset. Here, we remove the interactions and focus on a simpler regression.
+
+We also include health insurance. As health insurance is usually a benefit for many well paid jobs, we are expecting to see that people with health insurance have higher wages. The proportion of healthcare workers in the subset with health insurance is ~97.94%. We may not see a large enough difference between the two groups for it to be statistically significant. Let's see what the regression tells us.
+
+```{r}
+lmDepHealth <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college + deptime + HCOVANY), data = dat_med)
+summary(lmDepHealth)
+```
+
+The results seem to indicate that health insurance is not statistically significant. The high p-value of ~0.40908 suggests a relationship does not exist between health insurance and wages. This seems to confirm what we had suspected when looking at the proportion of observations with health insurance.
+
+Here is a regression isolating the health insurance variable to see how the p-value changes.
+
+```{r, eval= FALSE}
+lmDepHealth1 <- lm((INCWAGE ~ AGE + I(AGE^2) + HCOVANY), data = dat_med)
+summary(lmDepHealth1)
+```
+The health insurance variable by itself still shows a high p-value of ~0.19885. We would fail to reject the null hypothesis that "no relationship exists between health insurance and wages." The variable HCOVANY would not be useful in helping us predict wages. We will not include it in our regression model. Instead, we focus on departure time.
+
+For departure time, we would expect that those departing during the morning hours (5am-9am) would earn the most as most of these roles are administrative and managerial, followed by the healthcare workers who work the graveyard shift due to the pay differential. And lastly, daytime and evening commuters would have wages slightly less.
+```{r}
+summary(lmDepHealth2)
+```
+Running this regression model with the departure time shows p-values of ~0.09 for both Night and Morning departure times. We would fail to reject the null hypothesis at the 5% level of significance, perhaps saying that there is no relationship between Night and Morning departure times and wages. The "mid" (9:31am - 5pm) departure time appears to show that there is a relationship between leaving for work in the middle of the day and a healthcare worker's wages.  
+
+We note that R has dropped a dummy variable from our factor, namely the Graveyard departure time. To fix this, we will reorder the factor to drop off either the Night or Morning shift instead, as we determined both of these were not statistically significant at the 5% level of significance.  
+
+After adjusting our factors for departure time, we can see that Graveyard and Midday are still statistically significant with p-values less than 0.05.
+
+```{r include=FALSE}
+plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
+medpredict1 <- data.frame(AGE = 25:70, female = 1, educ_college = 1, deptime = "Mid")
+medpredict2 <- data.frame(AGE = 25:70, female = 1, educ_college = 1, deptime = "Grave")
+medpredict1$yhat <- predict(lmDepHealth2, newdata = medpredict1)
+medpredict2$yhat <- predict(lmDepHealth2, newdata = medpredict2)
+lines(yhat ~ AGE, data = medpredict1, col = "Black")
+lines(yhat ~ AGE, data = medpredict2, col = "Red")
+legend("topleft", c("Grave", "Mid"), lty = 1, col=c("Red", "Black"), bty = "n")
+max(medpredict1$yhat) #peak predicted wage for Mid 
+max(medpredict2$yhat) #peak predicted wage for Grave
+```
+![Deptime Plots](./deptimeplot.png)  
+Based on our plotted regression line, the Graveyard commute gets paid slightly more than the Mid commute healthcare workers. The difference does not seem to be very large. Looking at the peak wages of 73446 for Graveyard departure times and 72387 for Mid departure times, this is only a 1.46% difference in peak predicted wages. The difference in estimated coefficients from the regression output above match what the peak predicted values indicate; the difference between is the change in y-intercept, not the slope of the curve.
+
+We would predict slightly higher wages for those workers who have a Graveyard commute than those with a Midday commute. This did not match our expectations; we thought workers with a Morning commute would have the highest predicted wages but this variable ended up being not statistically significant.  
+
+In terms of considering this correlation to be a casual link, we would have to look into deeper why the Morning and Night commutes are non-significant at the 5% level. We need to make sure that the variation of departure time and wages change together. The inclusion of the health insurance variable demonstrated that the relationship between the independent and dependent variables was not definitively X to Y - rather, it is more likely the case that many of the observations had health insurance because a) they work in the field and b) they are well paid and can afford to purchase insurance.
+
+It's evident that each regression model, be it with polynomials, logs or interactions, suits different purposes and highlights different information. We quickly ascertained from the interaction regression that perhaps less is more (or perhaps keener insight into the impact of interactions on a dataset of the size we have) and while it gave us a broad insight into the effect of departure time, we were able to parse out clearer information when we reverted to a more basic regression. Understanding the context of the data and having a clear idea of how the variables will interact with each other are important skills necessary to effectively utilize these models.
 
 ### Bibliography
 https://cps.ipums.org/cps-action/variables/INCWAGE#description_section
 
-Glied, Sherry A., Ma, Stephanie  and Pearlstein, Ivanna, (2015). "Understanding Pay Differentials Among Health Professionals, Nonprofessionals, And Their Counterparts In Other Sectors" https://www.healthaffairs.org/doi/full/10.1377/hlthaff.2014.1367
+Glied, Sherry A., Ma, Stephanie  and Pearlstein, Ivanna, (2015). "Understanding Pay Differentials Among Health Professionals, Nonprofessionals, And Their Counterparts In Other Sectors", https://www.healthaffairs.org/doi/full/10.1377/hlthaff.2014.1367
 
-Our Regression Model: Departure Time and Health Insurance
+Suni, Eric., (2020) "Circadian Rhythm", https://www.sleepfoundation.org/circadian-rhythm#:~:text=The%20sleep%2Dwake%20cycle%20is,keep%20us%20awake%20and%20active
 
-```{r, eval= FALSE}
-#In designing our regression model to create the best predictions for a person's wages, we wanted to try variables we have not used before. We arrived on using departure time and health insurance. 
-
-#We chose departure time because we thought that the time someone leaves for work would be a strong indicator of how much they make in wages. We believe that most people would want to work (and go to work) during daytime hours as this matches research shown that human biology follows a cycle where our brains are programmed to be awake and more alert during the sunny hours and start to wind down during the nighttime in preparation for rest. They call this the day and night cycle the circadian rhythm (https://www.sleepfoundation.org/circadian-rhythm#:~:text=The%20sleep%2Dwake%20cycle%20is,keep%20us%20awake%20and%20active). And research has also shown that it is hard for us humans to purposefully adjust our circadian rhythems so we can be more alert during nighttime hours (insert research link here). Therefore, we would expect that those who have departure times during the day time would have higher incomes than those who have "less desirable" departure times, such as a graveyard shift at a hospital.
-
-#We also chose health insurance as we thought this would be an easy way to distinguish between higher wages and lower waged people. We are expecting to see that people with health insurance probably have higher wages and people without health insurance have lower wages. This is because health insurance is seen as a "benefit" that the employer is providing to the employee. 
-attach(dat_med)
-lmDepHealth <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college + deptime + HCOVANY))
-summary(lmDepHealth)
-
-#Results: The results of this regression analysis where we put both departure time and health insurance seem to indicate that when put together, health insurance has a very high p-value, which indicates to us that there may not be a relationship that exists between health insurance and wages. This might be because the top half of wage-earners have a higher percentage of health insurance and the bottom half of wage-earners really do not have health insurance. The t-value of 0.826 is telling us that the coefficient estimate  for health insurance is not very far away from "zero," which would indicate no relationship existing between wages and health insurance.
-
-#Let's try to run a regression with only the health insurance variable to see if the p-value is the same.
-```
-
-
-```{r, eval= FALSE}
-lmDepHealth1 <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college + HCOVANY))
-summary(lmDepHealth1)
-
-#Results: running the health insurance variable by itself appears to still show a high p-value of ~0.19885 which is reaffirming to us that there is not a statistically significant relationship between health insurance and wages. In other words, we would fail to reject the null hypothesis that "no relationship exists between health insurance and wages." 
-
-#The variable health insurance would not be useful in helping us predict wages. We will not include it in our regression model.
-
-#Now, let's focus on departure time. We will run a regression model for that next.
-```
-
-
-```{r, eval= FALSE}
-lmDepHealth2 <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college + deptime))
-summary(lmDepHealth2)
-
-#Running this regression model with the departure time shows p-values of ~0.09 for Night and Graveyard departure times where we would fail to reject the null hypothesis at at the 5% level of significance, perhaps saying that there is no relationship between Night and Graveyard departure times and wages. The "mid" (9am - 5pm) departure time appears to show that there is a relationship between leaving for work between the hours fo 9am - 5pm and a person's wages. But the estimated coefficient for mid seems to tell us that it has a negative correlation with wages, in other words, departing for work between 9am-5pm would indicate a person would have lower wages.
-
-#We also see that one of our departure time dummy variables has been dropped off, namely the morning departure times of 5am-9am, which is probably workers who mostly work in offices.
-```
-
-
-```{r, eval= FALSE}
-plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
-medpredict1 <- data.frame(AGE = 25:70, female = 1, educ_college = 1, deptime = "Mid", HCOVANY = 1)
-medpredict2 <- data.frame(AGE = 25:70, female = 1, educ_college = 1, deptime = "Morn", HCOVANY = 1)
-medpredict1$yhat <- predict(lmDepHealth, newdata = medpredict1)
-medpredict2$yhat <- predict(lmDepHealth, newdata = medpredict2)
-lines(yhat ~ AGE, data = medpredict1)
-lines(yhat ~ AGE, data = medpredict2, col = "Red")
-legend("topleft", c("Morn", "Mid"), lty = 1, col=c("Red", "Black"), bty = "n")
-max(medpredict1$yhat) #peak predicted wage
-max(medpredict2$yhat)
-print(medpredict1)
-```
-Our Regression Model: Departure Time and Health Insurance
-
-```{r, eval= FALSE}
-#In designing our regression model to create the best predictions for a healthworkers's wages, we wanted to try variables we have not used before. We arrived on using departure time and health insurance. 
-
-#We chose departure time because we think that this will be especially interesting to see for our subset of "healthcare" workers as the healthcare industry is known for it late night hours, especially for hospitals (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5399831/). We believe that most people would want to work (and go to work) during daytime hours as this matches research shown that human biology follows a cycle where our our brains are programmed to be awake and more alert during the sunny hours and start to wind down during the nighttime in preparation for rest. They call this day and night cycle the circadian rhythm (https://www.sleepfoundation.org/circadian-rhythm#:~:text=The%20sleep%2Dwake%20cycle%20is,keep%20us%20awake%20and%20active). 
-
-#Looking at a summary count of the departure times of our subset, we can see that ~80.92% work the "morning" shift, meaning they depart for work between 5am and 9am. The "morning" healthcare workers are probably "administrative" and "managerial" personnel who usually are paid more due to how they are higher up in the corporate ladder. This is also the commute time for the most desirable and most common working hours, "office hours." Next, Graveyard shift healthcare workers should have the next highest predicted wages as they receive the "pay differential" for working the graveyard shifts. Lastly, we would expect to see Mid and Night departure times with the least about of predicted wages.
-
-Factoring in how graveyard shifts are usually paid a "pay differential" to make-up for a worker working during the less desirable hours, we would expect that these graveyard shift healthcare workers would probably have higher pay than their "daytime" and "evening" counterparts. 
-
-#We also chose health insurance as we thought this would be an easy way to help determine and predict wages. As health insurance is usually a benefit for most jobs except for some of the lower-skilled ones. We are expecting to see that people with health insurance probably have higher wages and people without health insurance probably have lower wages. But looking at the count of how many of our healthcare worker subset has health insurance, it appears to be very high at ~97.94%, which means that we may not see a large enough difference between the two groups for it to be statistically significant. Let's see what the regression tells us.
-
-lmDepHealth <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college + deptime + HCOVANY))
-summary(lmDepHealth)
-
-#Results: The results of this regression analysis seem to indicate that health insurance is not statistically significant given it's high p-value of ~0.40908 which means a relationship does not exist between health insurance and wages. The t-value of 0.826 is telling us that the coefficient estimate for health insurance is not very far away from "zero," which would indicate no relationship existing between wages and health insurance. This is in agreement with what we had suspected when looking at the count between those with health insurance and those without. This lack of statistical significance maybe due to that.
-
-#Let's try to run a regression isolating the health insurance variable to see how the p-value changes.
-```
-
-
-```{r, eval= FALSE}
-lmDepHealth1 <- lm((INCWAGE ~ AGE + I(AGE^2) + HCOVANY))
-summary(lmDepHealth1)
-
-#Results: running the health insurance variable by itself appears to still show a high p-value of ~0.19885 which is reaffirming to us that there is not a statistically significant relationship between health insurance and wages. In other words, we would fail to reject the null hypothesis that "no relationship exists between health insurance and wages." 
-
-#The variable health insurance would not be useful in helping us predict wages. We will not include it in our regression model.
-
-#Now, let's focus on departure time. We will run a regression model for that next.
-```
-
-
-```{r, eval= FALSE}
-#For departure time, we would expect that those departing during the morning hours (5am-9am) would earn the most as most of these roles are administrative and managerial, followed by the healthcare workers who work the graveyard shift due to the pay differential. And lastly, daytime and evening commuters would have wages slightly less.
-
-
-lmDepHealth2 <- lm((INCWAGE ~ AGE + I(AGE^2) + educ_college + deptime))
-summary(lmDepHealth2)
-
-#Results: Running this regression model with the departure time shows p-values of ~0.09 for both Night and Graveyard departure times where we would fail to reject the null hypothesis at at the 5% level of significance, perhaps saying that there is no relationship between Night and Graveyard departure times and wages. The "mid" (9am - 5pm) departure time appears to show that there is a relationship between leaving for work in the middle of the day and a healthcare worker's wages.
-
-#We also see that one of our departure time dummy variables has been dropped off, namely the morning departure time of 5am-9am. To fix this, we will adjust our factors we created for departure time to drop off either the Night or Graveyard shift instead as we determined both of these were not statistically significant enough for us at the 5% level of significance.
-
-#After adjusting our factors for departure time, we can see that Morning and Midday are still statistically significant with p-values less than 0.05, so lets go ahead and plot these and compare them.
-```
-
-
-```{r, eval= FALSE}
-plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
-medpredict1 <- data.frame(AGE = 25:70, female = 1, educ_college = 1, deptime = "Mid", HCOVANY = 1)
-medpredict2 <- data.frame(AGE = 25:70, female = 1, educ_college = 1, deptime = "Morn", HCOVANY = 1)
-medpredict1$yhat <- predict(lmDepHealth, newdata = medpredict1)
-medpredict2$yhat <- predict(lmDepHealth, newdata = medpredict2)
-lines(yhat ~ AGE, data = medpredict1)
-lines(yhat ~ AGE, data = medpredict2, col = "Red")
-legend("topleft", c("Morn", "Mid"), lty = 1, col=c("Red", "Black"), bty = "n")
-max(medpredict1$yhat) #peak predicted wage for Mid 
-max(medpredict2$yhat) #peak predicted wage for Morn
-print(medpredict1)
-
-#Results: Based on our plotted regression line, the Mid shift gets paid slightly more than the Morning shift healthcare workers. the difference does not seem to be very large. Looking at the peak wages of $65,474.19 for Mid departure times and $64,235.12 for Morning departure times, this is only a 1.93% difference in wages.
-```
