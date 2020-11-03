@@ -65,10 +65,10 @@ visualization, the jitter has been set to 0.1, to demonstrate the trends
 at different ages and the range of the INCWAGE axis has been capped at
 300,000.
 
-To draw some comparison from the linear regression, we set the
+To draw some comparison from the initial regression, we set the
 prediction model to predict wages for those with advanced degrees.
 
-![initial regression plot](./initlmplot.png)
+![Initial Regression Plot](./initlmplot.png)
 
 The plot for the predicted values shows us a gently sloped concave curve
 that has a peak predicted value of 119489.4.
@@ -164,9 +164,6 @@ the relevant dummy by changing their order.
 We don’t apply polynomials or logs to the dummy variables as they will
 not have any effect on the regression. \(1^x = 1\); \(0^x = 0\).
 
-**Are your other dummy variables in the regression working sensibly with
-your selection criteria?**
-
 Here are some predicted values for each of the three regression models
 that we have created.
 
@@ -222,35 +219,114 @@ trends upwards until age reaches the mid 50s, then begins to trend down,
 the predicted values for log(INCWAGE + 1) stay consistent at
 approximately 11.0375274. If we take the log of this value, we see that
 a 1% increase in age has a corresponding average increase of 2.4013011
-in wages. **Discuss.**
+in wages.
 
-Try some interactions, like this,
+**Interactions**  
+For our interactions, we add a factor based on the times workers leave
+their homes to get to work. The factor is split into 4 time periods,
+Morn, Mid, Grave, Night, corresponding to (5am-9:30am), (9:31am-5:00pm),
+(5:01pm-11:59pm) and (12:00-4:59am) respectively.
+
+We chose departure time because we believe the time someone leaves for
+work would be a strong indicator of how much they make in wages. We take
+the assumption that most people prefer to work during daytime hours.
+Research has shown that human biology follows a [circadian
+rhythm](https://www.sleepfoundation.org/circadian-rhythm#:~:text=The%20sleep%2Dwake%20cycle%20is,keep%20us%20awake%20and%20active)
+to allow the brain and body to be awake and alert during the sunny hours
+and rest at nighttime. It is hard to purposefully adjust circadian
+rhythms so we can be more alert during nighttime hours *(insert research
+link here)*. Therefore, we expect that those who have departure times
+during the day time would have higher incomes than those who have “less
+desirable” departure times, such as a graveyard shift at a hospital.
+
+**Are your other dummy variables in the regression working sensibly with
+your selection criteria?**
 
     ## 
     ## Call:
-    ## lm(formula = INCWAGE ~ AGE + I(AGE^2) + educ_college + I(educ_college * 
-    ##     AGE) + I(educ_college * (AGE^2)))
+    ## lm(formula = INCWAGE ~ AGE + I(AGE^2) + deptime + educ_college + 
+    ##     (deptime * AGE) + (deptime * (AGE^2)) + (deptime * educ_college), 
+    ##     data = dat_med)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -123025  -35288  -10221   16683  576257 
     ## 
     ## Coefficients:
-    ##               (Intercept)                        AGE  
-    ##                 -98495.49                    8058.95  
-    ##                  I(AGE^2)               educ_college  
-    ##                    -71.89                   92301.75  
-    ##     I(educ_college * AGE)  I(educ_college * (AGE^2))  
-    ##                  -4863.83                      41.81
+    ##                            Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)               -25859.72   21598.79  -1.197   0.2313    
+    ## AGE                         5369.32     992.19   5.412 6.81e-08 ***
+    ## I(AGE^2)                     -48.40      10.84  -4.465 8.35e-06 ***
+    ## deptimeMid                -35954.03   21526.14  -1.670   0.0950 .  
+    ## deptimeGrave              -12252.80   28910.39  -0.424   0.6717    
+    ## deptimeNight               22627.20   24160.88   0.937   0.3491    
+    ## educ_college              -38997.79    3205.88 -12.164  < 2e-16 ***
+    ## AGE:deptimeMid               241.78     442.60   0.546   0.5849    
+    ## AGE:deptimeGrave            -171.82     582.60  -0.295   0.7681    
+    ## AGE:deptimeNight            -593.86     463.27  -1.282   0.2000    
+    ## deptimeMid:educ_college    21894.38   10876.21   2.013   0.0442 *  
+    ## deptimeGrave:educ_college  15521.92   13915.71   1.115   0.2648    
+    ## deptimeNight:educ_college  17294.45   13870.83   1.247   0.2126    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 73770 on 2613 degrees of freedom
+    ## Multiple R-squared:  0.08886,    Adjusted R-squared:  0.08468 
+    ## F-statistic: 21.24 on 12 and 2613 DF,  p-value: < 2.2e-16
 
     ## 
-    ## Call:
-    ## lm(formula = INCWAGE ~ AGE + I(AGE^2) + educ_college + I(educ_college * 
-    ##     AGE) + educ_advdeg + I(educ_advdeg * AGE))
-    ## 
-    ## Coefficients:
-    ##           (Intercept)                    AGE               I(AGE^2)  
-    ##             -54253.84                5971.18                 -49.01  
-    ##          educ_college  I(educ_college * AGE)            educ_advdeg  
-    ##              12721.32               -1071.56                     NA  
-    ##  I(educ_advdeg * AGE)  
-    ##                    NA
+    ## =====================================================
+    ##                               Dependent variable:    
+    ##                           ---------------------------
+    ##                                     INCWAGE          
+    ## -----------------------------------------------------
+    ## AGE                              5,369.325***        
+    ##                                    (992.194)         
+    ##                                                      
+    ## I(AGE2)                           -48.405***         
+    ##                                    (10.841)          
+    ##                                                      
+    ## deptimeMid                       -35,954.030*        
+    ##                                  (21,526.140)        
+    ##                                                      
+    ## deptimeGrave                      -12,252.800        
+    ##                                  (28,910.390)        
+    ##                                                      
+    ## deptimeNight                      22,627.200         
+    ##                                  (24,160.880)        
+    ##                                                      
+    ## educ_college                    -38,997.790***       
+    ##                                   (3,205.877)        
+    ##                                                      
+    ## AGE:deptimeMid                      241.784          
+    ##                                    (442.596)         
+    ##                                                      
+    ## AGE:deptimeGrave                   -171.822          
+    ##                                    (582.602)         
+    ##                                                      
+    ## AGE:deptimeNight                   -593.855          
+    ##                                    (463.267)         
+    ##                                                      
+    ## deptimeMid:educ_college          21,894.380**        
+    ##                                  (10,876.210)        
+    ##                                                      
+    ## deptimeGrave:educ_college         15,521.920         
+    ##                                  (13,915.710)        
+    ##                                                      
+    ## deptimeNight:educ_college         17,294.440         
+    ##                                  (13,870.830)        
+    ##                                                      
+    ## Constant                          -25,859.720        
+    ##                                  (21,598.790)        
+    ##                                                      
+    ## -----------------------------------------------------
+    ## Observations                         2,626           
+    ## R2                                   0.089           
+    ## Adjusted R2                          0.085           
+    ## Residual Std. Error         73,769.790 (df = 2613)   
+    ## F Statistic                21.237*** (df = 12; 2613) 
+    ## =====================================================
+    ## Note:                     *p<0.1; **p<0.05; ***p<0.01
 
 and explain those outputs (different peaks for different groups).
 

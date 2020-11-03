@@ -43,7 +43,7 @@ The regressor coefficients from the initial regression all appear to be statisti
 
 From this regression, we created our prediction model using 50% of the 2626 observations in our subset in order to give the model a sizable enough sample from which to draw its comparisons. For easy visualization, the jitter has been set to 0.1, to demonstrate the trends at different ages and the range of the INCWAGE axis has been capped at 300,000.
 
-To draw some comparison from the linear regression, we set the prediction model to predict wages for those with advanced degrees.  
+To draw some comparison from the initial regression, we set the prediction model to predict wages for those with advanced degrees.  
 ```{r}
 attach(dat_med)
 NNobs <- length(INCWAGE)
@@ -52,16 +52,18 @@ graph_obs <- (runif(NNobs) < 0.5)
 med_graph <-subset(dat_med, graph_obs)
 detach()
 ```
-```{r include = FALSE}
+```{r include=FALSE}
+png(filename="./initlmplot.png")
 plot(INCWAGE ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = med_graph)
 medpredict <- data.frame(AGE = 25:70, female = 1, educ_college = 1, educ_advdeg = 1)
 medpredictb <- data.frame(AGE = 25:70, female = 1, educ_college = 0, educ_advdeg = 1)
 medpredictb$yhat <- predict(lma, newdata = medpredictb)
 lines(yhat ~ AGE, data = medpredictb)
+dev.off()
 initmax <- max(medpredictb$yhat)
 ```
+![Initial Regression Plot](./initlmplot.png)
 
-![initial regression plot](./initlmplot.png)
 
 The plot for the predicted values shows us a gently sloped concave curve that has a peak predicted value of `r format(round(initmax, digits = 2), scientific=FALSE)`.
 
@@ -119,8 +121,6 @@ Were we to add the *educ_hs* dummy variable into this regression it would have z
 
 We don't apply polynomials or logs to the dummy variables as they will not have any effect on the regression. $1^x = 1$; $0^x = 0$.
 
-**Are your other dummy variables in the regression working sensibly with your selection criteria?**
-
 Here are some predicted values for each of the three regression models that we have created.
 ```{r}
 display <- filter(comptable, (AGE >=57 & AGE <=61 | AGE >=30 & AGE <=34))
@@ -147,27 +147,18 @@ legend("topleft", "Log of log", col = "Orange", lty = 1, bty = "n")
 logcomps <- medpredictb[c(1,7,8)]
 head(logcomps)
 ```
-Changing our dependent variable to log(INCWAGE + 1) depicts the percentage change in wages in response to a percentage change in age. While the pattern of predicted values in the regression with INCWAGE trends upwards until age reaches the mid 50s, then begins to trend down, the predicted values for log(INCWAGE + 1) stay consistent at approximately `r mean(medpredictb$yhatlogfun)`. If we take the log of this value, we see that a 1% increase in age has a corresponding average increase of `r log(mean(medpredictb$yhatlogfun))` in wages. **Discuss.**
-```{r include=FALSE}
-summary(lmlogb)
-medpredictb
-log(mean(medpredictb$yhatlogfun))
-log(mean(medpredictb$yhatlog))
-mean(medpredictb$yhatlog)
-png(filename="initlmplot.png")
-dev.off()
-# include new regressions with healthins and deptime
-```
+Changing our dependent variable to log(INCWAGE + 1) depicts the percentage change in wages in response to a percentage change in age. While the pattern of predicted values in the regression with INCWAGE trends upwards until age reaches the mid 50s, then begins to trend down, the predicted values for log(INCWAGE + 1) stay consistent at approximately `r mean(medpredictb$yhatlogfun)`. If we take the log of this value, we see that a 1% increase in age has a corresponding average increase of `r log(mean(medpredictb$yhatlogfun))` in wages. 
 
-Try some interactions, like this,
+**Interactions**  
+For our interactions, we add a factor based on the times workers leave their homes to get to work. The factor is split into 4 time periods, `r levels(deptime)`, corresponding to (5am-9:30am), (9:31am-5:00pm), (5:01pm-11:59pm) and (12:00-4:59am) respectively.  
+
+We chose departure time because we believe the time someone leaves for work would be a strong indicator of how much they make in wages. We take the assumption that most people prefer to work during daytime hours. Research has shown that human biology follows a [circadian rhythm](https://www.sleepfoundation.org/circadian-rhythm#:~:text=The%20sleep%2Dwake%20cycle%20is,keep%20us%20awake%20and%20active) to allow the brain and body to be awake and alert during the sunny hours and rest at nighttime. It is hard to purposefully adjust circadian rhythms so we can be more alert during nighttime hours *(insert research link here)*. Therefore, we expect that those who have departure times during the day time would have higher incomes than those who have "less desirable" departure times, such as a graveyard shift at a hospital.
+
+**Are your other dummy variables in the regression working sensibly with your selection criteria?**  
 ```{r}
-# interactions
-attach(dat_med)
-lminter <- lm(INCWAGE ~ AGE + I(AGE^2) + educ_college + I(educ_college*AGE) + I(educ_college*(AGE^2)))
-lminter
-lminterb <- lm(INCWAGE ~ AGE + I(AGE^2) + educ_college + I(educ_college*AGE) + educ_advdeg + I(educ_advdeg*AGE))
-lminterb
-detach()
+lminter <- lm(INCWAGE ~ AGE + I(AGE^2) + deptime + educ_college + (deptime*AGE) + (deptime*(AGE^2)) + (deptime*educ_college), data=dat_med)
+summary(lminter)
+suppressWarnings(stargazer(lminter, type = "text"))
 ```
 and explain those outputs (different peaks for different groups).
 
